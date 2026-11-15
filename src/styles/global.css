@@ -1186,3 +1186,47 @@ html[data-theme='dark'] { color-scheme: dark; }
 .theme-toggle .i-sun { display: none; }
 [data-theme='dark'] .theme-toggle .i-sun { display: block; }
 [data-theme='dark'] .theme-toggle .i-moon { display: none; }
+
+/* ---------- kumpulan video ---------- */
+/* Poster jadi gambar awal, video tidak diunduh sebelum ditekan play. */
+.video-set {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s3);
+  margin: var(--s5) 0;
+  align-items: start;
+}
+.video-set--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.video-item { margin: 0; }
+.video-set video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius);
+  background: var(--paper-deep);
+  border: 1px solid var(--line);
+}
+.video-set figcaption {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 0.5rem;
+}
+
+/* ---------- galeri dengan rasio asli ---------- */
+/* Materi asli jarang 4:3. Dipotong paksa bikin kepala dan poster terpangkas,
+   jadi biarkan rasionya apa adanya dan jaga baris tetap rata atas. */
+.gallery--natural { align-items: start; }
+.gallery--natural img {
+  aspect-ratio: auto;
+  object-fit: contain;
+  background: var(--paper-deep);
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 780px) {
+  .video-set,
+  .video-set--3 { grid-template-columns: 1fr; }
+}

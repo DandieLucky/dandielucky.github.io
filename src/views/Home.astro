@@ -12,7 +12,7 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = ui[lang];
-const featured = await getFeatured(lang, 6);
+const featured = await getFeatured(lang, 8);
 
 const heroParts = t.home.heroLines.map((line) =>
   line.split('*').map((part, i) => ({ text: part, em: i % 2 === 1 }))

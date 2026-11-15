@@ -1,10 +1,10 @@
 ---
 lang: id
 slug: posh-by-her
-order: 5
+order: 6
 title: "Fotografi Produk Posh by Her"
-tagline: "Memotret dan meretouch produk agar layak tampil sebagai materi promosi brand."
-summary: "Sesi foto produk dan retouching untuk kebutuhan konten serta katalog sebuah brand."
+tagline: "Memotret dan mengolah foto produk agar layak tampil sebagai materi promosi brand."
+summary: "Sesi foto produk dan pengolahan hasil untuk kebutuhan konten serta katalog sebuah brand."
 role: "Fotografer & Retoucher"
 client: "Posh by Her"
 year: "2026"
@@ -16,15 +16,15 @@ featured: true
 status: live
 ---
 
-import BeforeAfter from '../../../components/BeforeAfter.astro';
+import Gallery from '../../../components/Gallery.astro';
 
 ## Konteks
 
-Brand membutuhkan foto produk yang bisa dipakai berulang: untuk konten media sosial sekaligus materi katalog, dengan tampilan warna yang konsisten antar sesi.
+Brand membutuhkan foto produk yang bisa dipakai berulang: untuk konten media sosial sekaligus materi katalog, dengan warna yang konsisten antar sesi.
 
 ## Peran saya
 
-Memotret, menyeleksi hasil, dan meretouch sampai siap tayang sesuai arahan klien.
+Memotret, menyeleksi hasil, lalu mengolah sampai siap tayang sesuai arahan klien.
 
 ## Batasan
 
@@ -34,21 +34,25 @@ Memotret, menyeleksi hasil, dan meretouch sampai siap tayang sesuai arahan klien
 
 ## Proses
 
-1. **Menyiapkan set sederhana** dan menetapkan posisi cahaya yang dipakai untuk semua produk.
-2. **Memotret beberapa sudut** untuk setiap produk agar punya pilihan saat disusun jadi konten.
-3. **Menyeleksi** frame terbaik, membuang yang tidak memenuhi standar.
-4. **Retouching di Lightroom**: koreksi warna, kontras, membersihkan latar dan noda kecil.
+1. **Menyiapkan set sederhana** dan menetapkan posisi cahaya untuk semua produk.
+2. **Memotret beberapa sudut** per produk agar ada pilihan saat disusun jadi konten.
+3. **Menyeleksi** frame terbaik dan membuang yang tidak memenuhi standar.
+4. **Mengolah di Lightroom**: koreksi warna, kontras, membersihkan latar dan noda kecil.
 
-<BeforeAfter
-  before="/assets/work/posh-by-her/before.jpg"
-  after="/assets/work/posh-by-her/after.jpg"
-  labelBefore="Sebelum"
-  labelAfter="Sesudah retouch"
-  caption="Geser untuk membandingkan — ganti before.jpg & after.jpg dengan file asli"
+<Gallery
+  natural
+  items={[
+    { src: '/assets/work/posh-by-her/foto-01.jpg', alt: 'Foto produk Posh by Her', caption: 'Sesi 1' },
+    { src: '/assets/work/posh-by-her/foto-02.jpg', alt: 'Foto produk Posh by Her', caption: 'Sesi 1' },
+    { src: '/assets/work/posh-by-her/foto-03.jpg', alt: 'Foto produk Posh by Her', caption: 'Sesi 1' },
+    { src: '/assets/work/posh-by-her/foto-04.jpg', alt: 'Foto produk Posh by Her', caption: 'Sesi 1' },
+    { src: '/assets/work/posh-by-her/foto-05.jpg', alt: 'Foto produk Posh by Her', caption: 'Sesi 1' },
+    { src: '/assets/work/posh-by-her/foto-06.jpg', alt: 'Foto produk Posh by Her', caption: 'Sesi 1' },
+    { src: '/assets/work/posh-by-her/foto-07.jpg', alt: 'Foto produk Posh by Her', caption: 'Sesi 1' },
+  ]}
 />
 
 ## Hasil
 
 - Satu set foto produk siap pakai untuk konten dan katalog.
 - Warna dan pencahayaan konsisten sehingga materi dari sesi berbeda bisa disatukan.
-- **[DATA MENYUSUL]** jumlah foto yang diserahkan dan tautan contoh penggunaannya.

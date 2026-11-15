@@ -1,0 +1,40 @@
+---
+/**
+ * Kumpulan video dalam satu blok.
+ * Poster dipakai sebagai gambar awal (`preload="none"`), jadi tidak ada byte
+ * video yang diunduh sebelum pengunjung menekan play.
+ */
+interface Item {
+  src: string;
+  poster: string;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  items: Item[];
+  columns?: 2 | 3;
+}
+
+const { items, columns = 2 } = Astro.props;
+---
+
+<div class={columns === 3 ? 'video-set video-set--3' : 'video-set'}>
+  {items.map((v) => (
+    <figure class="video-item">
+      <video
+        controls
+        playsinline
+        preload="none"
+        poster={v.poster}
+        aria-label={v.alt}
+        width="1600"
+        height="900"
+      >
+        <source src={v.src} type="video/mp4" />
+        <a href={v.src}>Unduh video</a>
+      </video>
+      {v.caption && <figcaption>{v.caption}</figcaption>}
+    </figure>
+  ))}
+</div>

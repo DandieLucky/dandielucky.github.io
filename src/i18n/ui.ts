@@ -22,7 +22,7 @@ export function otherLangPath(pathname: string, to: Lang): string {
 
 type Copy = {
   meta: { locale: string; dir: 'ltr' };
-  nav: { work: string; about: string; lab: string; contact: string; menu: string };
+  nav: { work: string; gallery: string; about: string; lab: string; contact: string; menu: string };
   ui: {
     skip: string;
     langSwitch: string;
@@ -72,6 +72,14 @@ type Copy = {
     portraitSlot: string;
   };
   lab: { title: string; description: string; eyebrow: string; lede: string; status: string; stack: string };
+  photos: {
+    title: string;
+    description: string;
+    eyebrow: string;
+    headline: string;
+    lede: string;
+    note: string;
+  };
   contact: {
     title: string;
     description: string;
@@ -89,7 +97,7 @@ type Copy = {
 export const ui: Record<Lang, Copy> = {
   id: {
     meta: { locale: 'id_ID', dir: 'ltr' },
-    nav: { work: 'Karya', about: 'Tentang', lab: 'Lab', contact: 'Kontak', menu: 'Menu' },
+    nav: { work: 'Karya', gallery: 'Fotografi', about: 'Tentang', lab: 'Lab', contact: 'Kontak', menu: 'Menu' },
     ui: {
       skip: 'Lompat ke konten',
       langSwitch: 'Ganti bahasa',
@@ -184,6 +192,14 @@ export const ui: Record<Lang, Copy> = {
       skillsTitle: 'Keahlian & alat',
       portraitSlot: 'Slot foto — ganti public/assets/about/portrait.jpg',
     },
+    photos: {
+      title: 'Fotografi — arsip',
+      description: 'Arsip foto: dokumentasi acara, potret, dan pemandangan yang saya ambil sendiri.',
+      eyebrow: 'Fotografi',
+      headline: 'Arsip foto',
+      lede: 'Sebagian foto lepas di luar proyek klien — hasil latihan dan dokumentasi lapangan. Semua diambil dan diolah sendiri.',
+      note: 'Klik foto untuk melihat ukuran penuh.',
+    },
     lab: {
       title: 'Lab — eksperimen & alat kecil',
       description: 'Eksperimen di luar brief: alat kecil yang saya bangun sendiri, termasuk workflow AI agent untuk produksi desain.',
@@ -213,7 +229,7 @@ export const ui: Record<Lang, Copy> = {
 
   en: {
     meta: { locale: 'en_US', dir: 'ltr' },
-    nav: { work: 'Work', about: 'About', lab: 'Lab', contact: 'Contact', menu: 'Menu' },
+    nav: { work: 'Work', gallery: 'Photography', about: 'About', lab: 'Lab', contact: 'Contact', menu: 'Menu' },
     ui: {
       skip: 'Skip to content',
       langSwitch: 'Switch language',
@@ -306,6 +322,14 @@ export const ui: Record<Lang, Copy> = {
       timelineTitle: 'Path',
       skillsTitle: 'Skills & tools',
       portraitSlot: 'Image slot — replace public/assets/about/portrait.jpg',
+    },
+    photos: {
+      title: 'Photography — archive',
+      description: 'Photo archive: event documentation, portraits, and scenery I shot myself.',
+      eyebrow: 'Photography',
+      headline: 'Photo archive',
+      lede: 'Standalone photographs outside client work — practice and field documentation. All shot and edited by me.',
+      note: 'Click a photo to open it full size.',
     },
     lab: {
       title: 'Lab — experiments & small tools',

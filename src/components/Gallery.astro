@@ -1,6 +1,7 @@
 ---
 import { assetExists } from '../lib/work';
 import assets from '../data/assets.json';
+import sizes from '../data/asset-meta.json';
 
 interface Item {
   src: string;
@@ -11,16 +12,27 @@ interface Item {
 interface Props {
   items: Item[];
   columns?: 2 | 3;
+  /** rasio asli tiap gambar, bukan dipotong 4:3 */
+  natural?: boolean;
 }
 
-const { items, columns = 2 } = Astro.props;
+const { items, columns = 2, natural = false } = Astro.props;
 
 const assetMap = assets as Record<string, boolean>;
-const isPlaceholder = (src: string) => assetMap[`/${src}`] === true;
+const sizeMap = sizes as Record<string, [number, number]>;
+const isPlaceholder = (src: string) => assetMap[src.startsWith('/') ? src : `/${src}`] === true;
 const strip = (s: string) => (s.startsWith('/') ? s.slice(1) : s);
+/** ukuran asli supaya halaman tidak melompat saat gambar dimuat */
+const dims = (src: string) => sizeMap[src.startsWith('/') ? src : `/${src}`] ?? [1200, 900];
 ---
 
-<div class={columns === 3 ? 'gallery gallery--3' : 'gallery'}>
+<div
+  class:list={[
+    'gallery',
+    columns === 3 && 'gallery--3',
+    natural && 'gallery--natural',
+  ]}
+>
   {items.map((item) => {
     const clean = strip(item.src);
     const exists = assetExists(item.src);
@@ -28,7 +40,14 @@ const strip = (s: string) => (s.startsWith('/') ? s.slice(1) : s);
       <figure>
         {exists ? (
           <a class="slot-media" href={`/${clean}`} data-lightbox-link aria-label={item.alt}>
-            <img src={`/${clean}`} alt={item.alt} loading="lazy" decoding="async" width="1200" height="900" />
+            <img
+              src={`/${clean}`}
+              alt={item.alt}
+              loading="lazy"
+              decoding="async"
+              width={dims(item.src)[0]}
+              height={dims(item.src)[1]}
+            />
             {isPlaceholder && <span class="asset-flag">slot aset</span>}
           </a>
         ) : (

@@ -53,22 +53,31 @@ def find_font(candidates, size):
     return ImageFont.load_default()
 
 
+# Daftar proyek mengikuti folder Assets/ (lihat scripts/import-assets.mjs).
+# Aset asli sudah masuk lewat skrip impor; pembuat placeholder tetap disimpan
+# untuk berjaga-jaga kalau ada slot baru.
 PALETTES = {
     "matahari-grosir": {"bg": "#F2E8DA", "ink": "#2B2118", "accent": "#C4632B"},
-    "olimpiade-pkkmb": {"bg": "#16283F", "ink": "#F5EFE3", "accent": "#E0A458"},
+    "olimpiade-polimedia-2025": {"bg": "#16283F", "ink": "#F5EFE3", "accent": "#E0A458"},
+    "pkkmb-polimedia-2026": {"bg": "#1C3F5E", "ink": "#F2F5F8", "accent": "#E0A458"},
     "pusinfomar": {"bg": "#E9EBED", "ink": "#1A2430", "accent": "#2F6F8F"},
-    "darya-varia-hut50": {"bg": "#3A1F2B", "ink": "#F6E9D8", "accent": "#C9A227"},
+    "darya-varia": {"bg": "#3A1F2B", "ink": "#F6E9D8", "accent": "#C9A227"},
     "posh-by-her": {"bg": "#F3E5E3", "ink": "#3A2A2A", "accent": "#B4736A"},
-    "identitas-visual": {"bg": "#F1EFE6", "ink": "#20241F", "accent": "#4A6B4F"},
+    "wilhelmina-cup-2024": {"bg": "#F1EFE6", "ink": "#20241F", "accent": "#4A6B4F"},
+    "si-paling-film": {"bg": "#20242B", "ink": "#F2F0EA", "accent": "#B85C38"},
+    "bnsp": {"bg": "#EFF1F3", "ink": "#1B2531", "accent": "#2F6F8F"},
 }
 
 PROJECTS = [
     ("matahari-grosir", "Matahari Grosir", "Konten media sosial · 2025—sekarang"),
-    ("olimpiade-pkkmb", "Olimpiade & PKKMB", "Identitas event kampus · 2026"),
+    ("olimpiade-polimedia-2025", "Olimpiade Polimedia", "Identitas event kampus · 2025"),
+    ("pkkmb-polimedia-2026", "PKKMB Polimedia", "Konten pengenalan kampus · 2026"),
     ("pusinfomar", "Pusinfomar", "UI/UX aplikasi internal · 2026"),
-    ("darya-varia-hut50", "Darya Varia 50", "Motion graphics · 2026"),
+    ("darya-varia", "Darya Varia 50", "Motion graphics · 2026"),
     ("posh-by-her", "Posh by Her", "Fotografi produk · 2026"),
-    ("identitas-visual", "Proyek Identitas", "Brand identity · segera"),
+    ("wilhelmina-cup-2024", "Wilhelmina Cup", "Identitas visual acara · 2024"),
+    ("si-paling-film", "Si Paling Film", "Penyuntingan video konten"),
+    ("bnsp", "BNSP", "Materi pelatihan & dokumentasi"),
 ]
 
 generated: dict[str, str] = {}

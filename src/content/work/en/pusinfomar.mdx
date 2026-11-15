@@ -1,15 +1,15 @@
 ---
 lang: en
 slug: pusinfomar
-order: 3
+order: 4
 title: "Designing the Pusinfomar Internal Application Interface"
-tagline: "A UI/UX project for a public institution: turning field users' needs into clear flows and interfaces."
-summary: "Interface design for an internal application: needs gathering, user flows, wireframes, prototype and a component guide in Figma."
+tagline: "A UI/UX project for an institution: translating field users’ needs into clear flows and interfaces."
+summary: "Interface design for an internal application: requirements research, user flows, wireframes, prototype, and a component guide in Figma."
 role: "UI/UX Designer"
 client: "TNI AL — Pusinfomar"
 year: "2026"
 disciplines: ["uiux", "desain"]
-scope: ["Needs gathering", "User flow", "Wireframe", "Prototype", "Design system"]
+scope: ["Requirements research", "User flow", "Wireframe", "Prototype", "Design system"]
 tools: ["Figma"]
 cover: "/assets/work/pusinfomar/cover.jpg"
 featured: true
@@ -17,39 +17,38 @@ status: live
 ---
 
 import Gallery from '../../../components/Gallery.astro';
+import VideoSet from '../../../components/VideoSet.astro';
 
 ## Context
 
-An internal application supporting day-to-day work inside an institution. Its users are not people who live in design tools, so the interface has to be understandable without long training.
+An internal application for field users, inside an environment with strict procedures. The interface has to be clear at a glance, because people use it while on the move.
 
 ## My role
 
-Interface designer: gathering requirements, mapping workflows, building wireframes, then executing high-fidelity mockups and a prototype in Figma until the design was approved.
+UI/UX designer: gathering requirements from users, shaping the flows, producing wireframes, then building the prototype and the component guide.
 
 ## Constraints
 
-- **Some project details are restricted**, so this page shows the design process — not real data or screenshots.
-- Requirements arrived verbally and in stages, not as a specification document.
-- Design decisions had to be justifiable to non-designer stakeholders.
+- Some details are restricted by institutional policy — the screens shown here stay within what is allowed.
+- Not every user is comfortable with complex applications.
+- Every element needs a reason; no decoration that eats space.
 
 ## Process
 
-1. **Mapping the main user tasks**, then writing a user flow for each.
-2. **Low-fidelity wireframes** to test the information order before discussing visuals.
-3. **High-fidelity mockups** built from reusable components.
-4. **An interactive prototype** to test flows, then iterating on feedback.
-5. **Preparing assets and a component guide** for the development team.
+1. **Gathering requirements** through interviews and observing the existing workflow.
+2. **Mapping user flows** from the most frequent tasks down to edge cases.
+3. **Producing low-fidelity wireframes** to test the order before any visual work.
+4. **Building a clickable prototype** and testing it with users.
+5. **Writing the design system**: components, spacing, and status rules so future screens stay consistent.
 
-<Gallery
+<VideoSet
   items={[
-    { src: '/assets/work/pusinfomar/proses-01.jpg', alt: 'User flow', caption: 'User flow — replace: proses-01.jpg' },
-    { src: '/assets/work/pusinfomar/proses-02.jpg', alt: 'Wireframe', caption: 'Wireframe — replace: proses-02.jpg' },
-    { src: '/assets/work/pusinfomar/proses-03.jpg', alt: 'Interface mockup', caption: 'Mockup — replace: proses-03.jpg' },
+    { src: '/assets/work/pusinfomar/rekam-01.mp4', poster: '/assets/work/pusinfomar/rekam-01-poster.jpg', alt: 'Screen recording of the Pusinfomar application', caption: 'Application flow recording' },
+    { src: '/assets/work/pusinfomar/rekam-02.mp4', poster: '/assets/work/pusinfomar/rekam-02-poster.jpg', alt: 'Second screen recording of the Pusinfomar application', caption: 'Second flow recording' },
   ]}
 />
 
 ## Outcome
 
-- The design was approved and handed over as assets plus a component guide ready for implementation.
-- Core flows were reduced to steps that can be followed without extra explanation.
-- **[DATA TO FOLLOW]** number of screens and modules designed.
+- A workflow that used to live in written procedures now has a shape on screen.
+- The design system lets new screens be added without reworking what has already been approved.

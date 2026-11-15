@@ -1,0 +1,274 @@
+{
+  "/assets/about/portrait.jpg": [
+    1200,
+    1500
+  ],
+  "/assets/gallery/foto-01.jpg": [
+    1600,
+    1063
+  ],
+  "/assets/gallery/foto-02.jpg": [
+    1600,
+    1063
+  ],
+  "/assets/gallery/foto-03.jpg": [
+    1600,
+    1063
+  ],
+  "/assets/gallery/foto-04.jpg": [
+    1600,
+    1063
+  ],
+  "/assets/gallery/foto-05.jpg": [
+    1328,
+    2000
+  ],
+  "/assets/gallery/foto-06.jpg": [
+    1600,
+    1067
+  ],
+  "/assets/gallery/foto-07.jpg": [
+    1600,
+    1067
+  ],
+  "/assets/gallery/foto-08.jpg": [
+    1333,
+    2000
+  ],
+  "/assets/gallery/foto-09.jpg": [
+    1600,
+    1067
+  ],
+  "/assets/gallery/foto-10.jpg": [
+    1333,
+    2000
+  ],
+  "/assets/gallery/foto-11.jpg": [
+    1600,
+    1067
+  ],
+  "/assets/og.png": [
+    1200,
+    630
+  ],
+  "/assets/work/bnsp/cover.jpg": [
+    1600,
+    900
+  ],
+  "/assets/work/bnsp/kegiatan-01.jpg": [
+    1600,
+    1280
+  ],
+  "/assets/work/bnsp/kegiatan-02.jpg": [
+    1220,
+    1344
+  ],
+  "/assets/work/bnsp/kegiatan-03.jpg": [
+    1224,
+    1241
+  ],
+  "/assets/work/bnsp/kegiatan-04.jpg": [
+    1224,
+    1280
+  ],
+  "/assets/work/bnsp/kegiatan-05.jpg": [
+    1125,
+    2000
+  ],
+  "/assets/work/darya-varia/cover.jpg": [
+    1600,
+    900
+  ],
+  "/assets/work/darya-varia/hut50-poster.jpg": [
+    1600,
+    900
+  ],
+  "/assets/work/matahari-grosir/cover.jpg": [
+    576,
+    1024
+  ],
+  "/assets/work/matahari-grosir/konten-01-poster.jpg": [
+    576,
+    1024
+  ],
+  "/assets/work/matahari-grosir/konten-02-poster.jpg": [
+    576,
+    1024
+  ],
+  "/assets/work/matahari-grosir/konten-03-poster.jpg": [
+    576,
+    1024
+  ],
+  "/assets/work/olimpiade-polimedia-2025/cover.jpg": [
+    1600,
+    900
+  ],
+  "/assets/work/olimpiade-polimedia-2025/poster-01.jpg": [
+    1071,
+    2000
+  ],
+  "/assets/work/olimpiade-polimedia-2025/poster-02.jpg": [
+    1071,
+    2000
+  ],
+  "/assets/work/olimpiade-polimedia-2025/poster-03.jpg": [
+    1071,
+    2000
+  ],
+  "/assets/work/olimpiade-polimedia-2025/poster-04.jpg": [
+    1071,
+    2000
+  ],
+  "/assets/work/olimpiade-polimedia-2025/poster-05.jpg": [
+    1071,
+    2000
+  ],
+  "/assets/work/olimpiade-polimedia-2025/poster-06.jpg": [
+    1071,
+    2000
+  ],
+  "/assets/work/olimpiade-polimedia-2025/poster-07.jpg": [
+    1071,
+    2000
+  ],
+  "/assets/work/olimpiade-polimedia-2025/poster-08.jpg": [
+    1071,
+    2000
+  ],
+  "/assets/work/olimpiade-polimedia-2025/poster-09.jpg": [
+    1071,
+    2000
+  ],
+  "/assets/work/pkkmb-polimedia-2026/cover.jpg": [
+    1600,
+    900
+  ],
+  "/assets/work/pkkmb-polimedia-2026/poster-01.jpg": [
+    1130,
+    2000
+  ],
+  "/assets/work/pkkmb-polimedia-2026/poster-02.jpg": [
+    1126,
+    2000
+  ],
+  "/assets/work/pkkmb-polimedia-2026/poster-03.jpg": [
+    1127,
+    2000
+  ],
+  "/assets/work/pkkmb-polimedia-2026/poster-04.jpg": [
+    1129,
+    2000
+  ],
+  "/assets/work/pkkmb-polimedia-2026/poster-05.jpg": [
+    1127,
+    2000
+  ],
+  "/assets/work/posh-by-her/cover.jpg": [
+    1600,
+    900
+  ],
+  "/assets/work/posh-by-her/foto-01.jpg": [
+    1336,
+    2000
+  ],
+  "/assets/work/posh-by-her/foto-02.jpg": [
+    1336,
+    2000
+  ],
+  "/assets/work/posh-by-her/foto-03.jpg": [
+    1336,
+    2000
+  ],
+  "/assets/work/posh-by-her/foto-04.jpg": [
+    1336,
+    2000
+  ],
+  "/assets/work/posh-by-her/foto-05.jpg": [
+    1336,
+    2000
+  ],
+  "/assets/work/posh-by-her/foto-06.jpg": [
+    1336,
+    2000
+  ],
+  "/assets/work/posh-by-her/foto-07.jpg": [
+    1336,
+    2000
+  ],
+  "/assets/work/pusinfomar/cover.jpg": [
+    720,
+    1280
+  ],
+  "/assets/work/pusinfomar/rekam-01-poster.jpg": [
+    720,
+    1280
+  ],
+  "/assets/work/pusinfomar/rekam-02-poster.jpg": [
+    720,
+    1280
+  ],
+  "/assets/work/si-paling-film/cover.jpg": [
+    900,
+    1600
+  ],
+  "/assets/work/si-paling-film/film-01-poster.jpg": [
+    900,
+    1600
+  ],
+  "/assets/work/si-paling-film/film-02-poster.jpg": [
+    900,
+    1600
+  ],
+  "/assets/work/si-paling-film/film-03-poster.jpg": [
+    480,
+    854
+  ],
+  "/assets/work/si-paling-film/film-04-poster.jpg": [
+    900,
+    1600
+  ],
+  "/assets/work/wilhelmina-cup-2024/cover.jpg": [
+    1600,
+    900
+  ],
+  "/assets/work/wilhelmina-cup-2024/logo.jpg": [
+    1080,
+    1080
+  ],
+  "/assets/work/wilhelmina-cup-2024/maskot-01.jpg": [
+    1080,
+    1080
+  ],
+  "/assets/work/wilhelmina-cup-2024/maskot-02.jpg": [
+    390,
+    644
+  ],
+  "/assets/work/wilhelmina-cup-2024/maskot-03.jpg": [
+    1080,
+    1080
+  ],
+  "/assets/work/wilhelmina-cup-2024/poster-01.jpg": [
+    1600,
+    533
+  ],
+  "/assets/work/wilhelmina-cup-2024/poster-02.jpg": [
+    1600,
+    533
+  ],
+  "/assets/work/wilhelmina-cup-2024/poster-03.jpg": [
+    1600,
+    533
+  ],
+  "/assets/work/wilhelmina-cup-2024/sertifikat.jpg": [
+    1600,
+    1131
+  ],
+  "/assets/work/wilhelmina-cup-2024/tote-01.jpg": [
+    1500,
+    2000
+  ],
+  "/assets/work/wilhelmina-cup-2024/tote-02.jpg": [
+    648,
+    526
+  ]
+}

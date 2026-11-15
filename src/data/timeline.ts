@@ -8,7 +8,7 @@ export type TimelineEntry = {
 export const timeline: TimelineEntry[] = [
   {
     year: 'Mei 2025 — sekarang',
-    role: { id: 'Social Media Specialist', en: 'Social Media Specialist' },
+    role: { id: 'Social Media Specialist & Desainer Konten', en: 'Social Media Specialist & Content Designer' },
     org: { id: 'Matahari Grosir', en: 'Matahari Grosir' },
   },
   {
@@ -24,7 +24,27 @@ export const timeline: TimelineEntry[] = [
   {
     year: '2026',
     role: { id: 'Desainer Konten Media Sosial', en: 'Social Media Content Designer' },
-    org: { id: 'Olimpiade Polimedia & PKKMB Polimedia', en: 'Polimedia Olympiad & PKKMB Polimedia' },
+    org: { id: 'PKKMB Polimedia 2026', en: 'PKKMB Polimedia 2026' },
+  },
+  {
+    year: '2025',
+    role: { id: 'Desainer Konten Media Sosial', en: 'Social Media Content Designer' },
+    org: { id: 'Olimpiade Polimedia 2025', en: 'Polimedia Olympiad 2025' },
+  },
+  {
+    year: '2024',
+    role: { id: 'Desainer Grafis (identitas acara)', en: 'Graphic Designer (event identity)' },
+    org: { id: 'Wilhelmina Cup', en: 'Wilhelmina Cup' },
+  },
+  {
+    year: '2026',
+    role: { id: 'Fotografer & Retoucher', en: 'Photographer & Retoucher' },
+    org: { id: 'Posh by Her', en: 'Posh by Her' },
+  },
+  {
+    year: '',
+    role: { id: 'Editor Video & Konten', en: 'Video Editor & Content' },
+    org: { id: 'Si Paling Film', en: 'Si Paling Film' },
   },
   {
     year: '',

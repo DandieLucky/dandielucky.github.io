@@ -62,35 +62,50 @@ portfolio-dandie/
 
 ---
 
-## 3. Mengisi aset (langkah paling penting)
+## 3. Aset karya (sudah terisi dari folder `Assets/`)
 
-Semua slot sudah ada gambar placeholder-nya. **Cara ganti: timpa file dengan nama yang sama.**
+Semua gambar dan video sudah masuk lewat skrip impor — tidak ada slot placeholder lagi, kecuali **foto profil**.
 
-```bash
-npm run check-assets     # lihat sisa slot
-# salin file asli menimpa placeholder, contoh:
-cp ~/Downloads/foto-feed-1.jpg public/assets/work/matahari-grosir/proses-01.jpg
-npm run build            # atau biarkan `npm run dev` menyegarkan sendiri
-```
-
-| Slot | Lokasi | Ukuran ideal | Format | Catatan |
-|---|---|---|---|---|
-| Cover proyek | `public/assets/work/<slug>/cover.jpg` | 1600×1200 (4:3) | JPG | dipakai di kartu karya + preview hover |
-| Gambar proses 1–3 | `public/assets/work/<slug>/proses-0{1,2,3}.jpg` | 1200×900 (4:3) | JPG | isi bagian Proses |
-| Before / After | `public/assets/work/posh-by-her/before.jpg` & `after.jpg` | 1200×900 | JPG | slider interaktif |
-| Foto profil | `public/assets/about/portrait.jpg` | 1200×1500 (4:5) | JPG | halaman Tentang & beranda |
-| OG image | `public/assets/og.png` | 1200×630 | PNG/JPG | pratinjau saat link dibagikan di WhatsApp/LinkedIn |
-| CV | `public/assets/cv/Dandie-Lucky-Maulana_CV.pdf` | — | PDF | tombol unduh CV |
-
-Tips: kompres JPG sampai di bawah ~400 KB (mis. [squoosh.app](https://squoosh.app)), dan jangan unggah foto mentah 8 MB dari kamera.
-
-Cara kerja penandanya: setiap file placeholder dibuat oleh `scripts/make-placeholders.py` dan membawa penanda byte `SLOT ASET` (komentar JPEG / teks PNG). `npm run check-assets` membaca penanda itu — jadi slot dianggap "terisi" begitu kamu menimpanya dengan file asli, tanpa perlu mengubah daftar apa pun. Kalau perlu membuat ulang placeholder tapi tidak ingin menimpa file tertentu (misalnya `og.png` yang sudah jadi):
+### Cara mengisi ulang / menambah aset
 
 ```bash
-python3 scripts/make-placeholders.py --skip og.png
+node scripts/import-assets.mjs                # proses semua proyek dari ./Assets
+node scripts/import-assets.mjs posh-by-her    # satu proyek saja
+node scripts/import-assets.mjs --dry          # hitung saja, tanpa menulis
+node scripts/import-assets.mjs --posters-only # perbarui gambar sampul video saja
+npm run check-assets                          # lihat sisa slot
 ```
 
-`/assets/og.png` adalah kartu pratinjau saat link dibagikan (WhatsApp, LinkedIn, X). Boleh diganti gambar apa pun berukuran 1200×630 px.
+Skrip itu membaca folder `Assets/` (materi mentah, tidak ikut diunggah) lalu menghasilkan aset web: cover **1600×900**, isi galeri dengan rasio asli (sisi panjang ≤1600), PNG transparan diratakan ke warna kertas, tangkapan layar Instagram dipangkas bilah status dan navigasi bawahnya, dan video dipotong jadi **highlight 25 detik** (sisi panjang ≤1080, +gambar sampul).
+
+Agar hanya satu tempat yang perlu diperbarui, peta folder → proyek ada di bagian atas `scripts/import-assets.mjs`:
+
+| Folder di `Assets/` | Slug di web | Isi |
+|---|---|---|
+| `MATAHARI GROSIR` | `matahari-grosir` | 3 video pendek |
+| `Olimpiade Polimedia2025` | `olimpiade-polimedia-2025` | 9 poster |
+| `PKKMB Polimedia 2026` | `pkkmb-polimedia-2026` | 5 poster |
+| `TNI Pusinformar` | `pusinfomar` | 2 rekaman aplikasi |
+| `Darya Varia` | `darya-varia` | 1 video motion |
+| `Posh by her` | `posh-by-her` | 7 foto produk |
+| `Wilhelmina Cup 2024` | `wilhelmina-cup-2024` | 10 aset identitas |
+| `Si Paling Film` | `si-paling-film` | 4 video |
+| `BNSP` | `bnsp` | 5 materi kegiatan |
+| `Foto lain-lain` | halaman `/fotografi` | 11 foto arsip |
+
+### Slot yang masih menunggu file asli
+
+| Slot | Lokasi | Ukuran ideal | Catatan |
+|---|---|---|---|
+| Foto profil | `public/assets/about/portrait.jpg` | 1200×1500 (4:5) | halaman Tentang & beranda |
+| OG image | `public/assets/og.png` | 1200×630 | kartu pratinjau saat link dibagikan |
+| CV | `public/assets/cv/Dandie-Lucky-Maulana_CV.pdf` | — | tombol unduh CV (sudah terisi) |
+
+**Jangan unggah foto mentah 8 MB.** Skrip impor yang mengurus pengecilan dan pemotongan; cukup taruh file aslinya di `Assets/`.
+
+### Ukuran berkas (kenapa kecil)
+
+`scripts/make-asset-meta.mjs` (jalan otomatis sebelum setiap build) mencatat ukuran asli setiap gambar ke `src/data/asset-meta.json`, supaya setiap `<img>` menyebut rasio yang benar dan halaman tidak melompat saat gambar dimuat. Video memakai `preload="none"` + gambar sampul, jadi tidak ada byte video yang terunduh sebelum pengunjung menekan play — total seluruh video ± 18 MB, gambar ± 8 MB.
 
 ---
 

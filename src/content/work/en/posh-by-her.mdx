@@ -1,10 +1,10 @@
 ---
 lang: en
 slug: posh-by-her
-order: 5
+order: 6
 title: "Product Photography for Posh by Her"
-tagline: "Shooting and retouching products so they are fit to represent the brand."
-summary: "Product photo sessions and retouching for content and catalogue use."
+tagline: "Shooting and processing product photos so they are ready to carry the brand."
+summary: "Product photo session and post-processing for both content and catalogue needs."
 role: "Photographer & Retoucher"
 client: "Posh by Her"
 year: "2026"
@@ -16,39 +16,43 @@ featured: true
 status: live
 ---
 
-import BeforeAfter from '../../../components/BeforeAfter.astro';
+import Gallery from '../../../components/Gallery.astro';
 
 ## Context
 
-The brand needed product photos it could reuse: for social media content and catalogue material, with colour that stays consistent between sessions.
+The brand needs product photos it can reuse: for social content and catalogue material alike, with colour that stays consistent across sessions.
 
 ## My role
 
-Shooting, selecting the results, and retouching until they were ready to publish according to the client's direction.
+Shooting, selecting the frames, then processing them to a publish-ready state per the client's direction.
 
 ## Constraints
 
-- Limited space and equipment, so lighting had to be simple but consistent.
-- Product colour had to stay accurate — it must not look different from the real item.
-- Results from different sessions had to still feel like one set.
+- Limited space and gear, so lighting is kept simple but consistent.
+- Product colour has to stay accurate — it may not look different from the real item.
+- Frames from different sessions still have to read as one series.
 
 ## Process
 
-1. **Setting up a simple set** and fixing the light position used for every product.
-2. **Shooting several angles** per product so there are options when composing content.
-3. **Selecting** the strongest frames and discarding the rest.
-4. **Retouching in Lightroom**: colour correction, contrast, cleaning the background and small marks.
+1. **Setting up a simple set** and fixing the light position for every product.
+2. **Shooting several angles** per product so there is a choice when composing content.
+3. **Selecting** the strongest frames and dropping the rest.
+4. **Processing in Lightroom**: colour correction, contrast, cleaning the background and small marks.
 
-<BeforeAfter
-  before="/assets/work/posh-by-her/before.jpg"
-  after="/assets/work/posh-by-her/after.jpg"
-  labelBefore="Before"
-  labelAfter="After retouch"
-  caption="Drag to compare — replace before.jpg and after.jpg with the real files"
+<Gallery
+  natural
+  items={[
+    { src: '/assets/work/posh-by-her/foto-01.jpg', alt: 'Posh by Her product photo', caption: 'Session 1' },
+    { src: '/assets/work/posh-by-her/foto-02.jpg', alt: 'Posh by Her product photo', caption: 'Session 1' },
+    { src: '/assets/work/posh-by-her/foto-03.jpg', alt: 'Posh by Her product photo', caption: 'Session 1' },
+    { src: '/assets/work/posh-by-her/foto-04.jpg', alt: 'Posh by Her product photo', caption: 'Session 1' },
+    { src: '/assets/work/posh-by-her/foto-05.jpg', alt: 'Posh by Her product photo', caption: 'Session 1' },
+    { src: '/assets/work/posh-by-her/foto-06.jpg', alt: 'Posh by Her product photo', caption: 'Session 1' },
+    { src: '/assets/work/posh-by-her/foto-07.jpg', alt: 'Posh by Her product photo', caption: 'Session 1' },
+  ]}
 />
 
 ## Outcome
 
-- One set of product photos ready for content and catalogue use.
+- One set of product photos ready for both content and catalogue.
 - Consistent colour and lighting, so material from different sessions can be combined.
-- **[DATA TO FOLLOW]** number of photos delivered and examples of use.
