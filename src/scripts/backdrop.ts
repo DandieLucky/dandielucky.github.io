@@ -46,7 +46,7 @@ const ambil = (nama: string, cadangan: number) => {
   const v = parseFloat(document.documentElement.dataset[nama] ?? '');
   return Number.isFinite(v) ? v : cadangan;
 };
-const damping = () => ambil('rippleDamping', 0.9975);
+const damping = () => ambil('rippleDamping', 0.992);
 const radiusJatuh = () => ambil('rippleRadius', 6);
 const kuatKlik = () => ambil('rippleKuat', 2400);
 const kuatHover = () => ambil('rippleHover', 300);
@@ -136,16 +136,18 @@ function langkah() {
       let baru =
         ((a[i - 1] + a[i + 1] + a[i - KOLOM] + a[i + KOLOM]) * 0.5 - b[i]) * redam;
       const diTepi = x < 2 || y < 2 || x > KOLOM - 3 || y > BARIS - 3;
-      if (diTepi) baru *= 0.55;
+      if (diTepi) baru *= 0.35;
       b[i] = baru;
       const abs = baru < 0 ? -baru : baru;
       if (abs > maks) maks = abs;
     }
   }
-  // tukar: b (keadaan baru) jadi a (sekarang), a jadi b (sebelumnya)
-  const tukar = a;
-  a = b;
-  b = tukar;
+  // b berisi keadaan baru -> tukar supaya `a` selalu keadaan sekarang
+  {
+    const tukar = a;
+    a = b;
+    b = tukar;
+  }
 
   // B. render: kemiringan gelombang -> kilau & bayangan
   const data = gambar.data;
@@ -192,7 +194,7 @@ function langkah() {
     if (v > sisa) sisa = v;
   }
 
-  if (maks < 1.5 && sisa < 12) {
+  if (maks < 2 && sisa < 45) {
     tenang = true;
     jalan = false;
     ctx.clearRect(0, 0, kanvas.width, kanvas.height);
