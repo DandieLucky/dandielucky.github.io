@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "check-assets": "node scripts/check-assets.mjs",
     "assets:placeholders": "python3 scripts/make-placeholders.py",
-    "deploy": "bash scripts/deploy.sh"
+    "deploy": "bash scripts/deploy.sh",
+    "publish": "bash scripts/publish.sh"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",

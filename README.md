@@ -113,62 +113,61 @@ python3 scripts/make-placeholders.py --skip og.png
 
 ---
 
-## 5. Deploy ke internet (gratis)
+## 5. Situs permanen (sudah terpasang)
 
-### Pratinjau cepat di HP (tanpa akun apa pun)
+Situs sudah hidup di **https://dandielucky.github.io** — gratis, permanen, dan tetap bisa diakses walau Mac-mu mati.
+
+| | |
+|---|---|
+| Repo | `github.com/DandieLucky/dandielucky.github.io` (publik) |
+| Cara terbit | GitHub Actions (`.github/workflows/deploy.yml`) — build di cloud, bukan di Mac-mu |
+| Pemicu | setiap `git push` ke `main` |
+| Waktu terbit | ±1 menit setelah push |
+
+### Memperbarui situs kapan pun
+
+```bash
+npm run publish              # build → commit → push → tunggu terbit → cetak status
+npm run publish "ganti foto cover Matahari Grosir"
+```
+
+Perintah itu membangun dulu di lokal sebagai pemeriksaan: kalau build rusak, tidak ada yang dikirim. Kalau kamu lebih suka manual, cukup `git add -A && git commit -m "…" && git push` — GitHub yang mengurus sisanya.
+
+### Kalau ada yang salah setelah terbit
+
+- **Kembalikan konten:** `git revert HEAD && git push` (atau ubah filenya, lalu `npm run publish` lagi).
+- **Lihat prosesnya:** `gh run list` dan `gh run view --log-failed` — atau buka tab Actions di repo.
+- **Periksa riwayat versi situsnya:** repo → **Deployments** (kanan halaman) → daftar setiap versi yang pernah terbit.
+
+### Kalau kamu ingin pindah host nanti
+
+Repo ini sekaligus jadi cadangan sumbernya. Host lain bisa menariknya langsung (Vercel, Netlify, Cloudflare Pages → semuanya bisa **Import from Git**): build command `npm run build`, output `dist`.
+
+### Pratinjau sementara di HP (opsional, untuk kerja cepat)
 
 ```bash
 ./scripts/preview-phone.sh
 ```
 
-Perintah itu melakukan build, menyalakan server lokal, lalu membuka tunnel Cloudflare. Hasilnya dua alamat:
+Nyala di jaringan lokal + tunnel `trycloudflare.com`. Sifatnya sementara — mati saat skrip dihentikan atau Mac tidur. Untuk situs permanen yang sudah jalan di GitHub Pages, ini tidak perlu dipakai.
 
-- `http://<IP-Mac>:4321` — untuk HP yang tersambung ke WiFi yang sama.
-- `https://xxxx.trycloudflare.com` — bisa dibuka dari jaringan mana pun, termasuk data seluler.
+### Setelah punya domain sendiri (misal dandielucky.com)
 
-Sifatnya sementara: URL mati begitu skrip dihentikan (Ctrl+C) atau Mac tidur. Untuk alamat permanen, pakai salah satu opsi di bawah.
+1. Beli domainnya.
+2. Di GitHub: repo → **Settings → Pages → Custom domain** → isi `dandielucky.com` → Save.
+3. Di penyedia domain, arahkan DNS:
+   - `A` untuk `@` → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+   - `CNAME` untuk `www` → `dandielucky.github.io`
+4. Tunggu sertifikat HTTPS terbit (otomatis), lalu centang **Enforce HTTPS**.
+5. Ubah `site:` di `astro.config.mjs` menjadi `https://dandielucky.com` dan baris `Sitemap:` di `public/robots.txt`, lalu `npm run publish`.
 
-### Opsi A — Cloudflare Pages lewat perintah (paling cepat)
+### Kalau butuh Cloudflare Pages sebagai alternatif
 
 ```bash
-npm run deploy      # build + unggah; pertama kali minta login sekali
+npm run deploy      # build + unggah ke Cloudflare Pages
 ```
 
-Nama proyek menentukan alamat gratismu: `--project-name dandielucky` → `https://dandielucky.pages.dev`.
-Setelah punya domain sendiri, buka **Cloudflare Pages → project → Custom domains → Add**.
-
-**Autentikasi (sekali saja, salah satu):**
-
-| Cara | Perintah / langkah | Cocok untuk |
-|---|---|---|
-| OAuth | `npx wrangler login` → tekan **Allow** di browser | Jalan normal, paling cepat |
-| API token | Buat token di *dash.cloudflare.com/profile/api-tokens* dengan izin **Account → Cloudflare Pages → Edit**, simpan ke `~/.cloudflare-pages-token` | Kalau CLI tidak bisa membuka browser, atau untuk otomatisasi |
-
-**Memperbarui situs kapan pun:** jalankan `npm run deploy` lagi. Tidak ada langkah lain — skripnya yang build, unggah, dan mencetak alamatnya.
-
-**Kalau ada yang salah setelah deploy:** buka **Cloudflare → Workers & Pages → dandielucky → Deployments**, pilih versi sebelumnya, klik **Rollback**. Situs langsung kembali ke versi lama.
-
-**Catatan versi supaya tidak berubah sendiri:** `wrangler` dikunci sebagai devDependency (4.162.0) dan `package-lock.json` ikut di-commit, jadi build di mesinmu memakai versi yang sama dari waktu ke waktu. Versi dependensi lain juga terkunci di lockfile itu.
-
-### Opsi B — drag & drop (tanpa terminal)
-
-1. `npm run build`
-2. Buka [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages → Create → Pages → Upload assets**
-3. Seret folder `dist/` ke halaman itu.
-4. Nama proyek: `dandie` → jadi `https://dandie.pages.dev`.
-
-### Opsi C — GitHub + Cloudflare (otomatis setiap kali push)
-
-1. `git remote add origin <repo-kamu>` lalu `git push -u origin main`
-2. Cloudflare Pages → **Connect to Git** → pilih repo.
-3. Build command: `npm run build` · Output directory: `dist`
-
-### Setelah punya domain sendiri
-
-Ubah dua tempat lalu build ulang:
-
-- `astro.config.mjs` → `site: 'https://dandielucky.com'`
-- `public/robots.txt` → baris `Sitemap:`
+Autentikasi sekali saja: `npx wrangler login` (tekan **Allow** di browser) — atau simpan API token dengan izin **Account → Cloudflare Pages → Edit** ke `~/.cloudflare-pages-token`. Versi `wrangler` dikunci sebagai devDependency agar tidak berubah sendiri.
 
 ---
 
