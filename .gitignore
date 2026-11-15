@@ -5,6 +5,8 @@ dist/
 npm-debug.log*
 
 # materi mentah karya (114 MB) — tetap di Mac, tidak ikut ke GitHub
-Assets/
+# Garis miring di depan wajib: tanpa itu, macOS yang tidak membedakan
+# huruf besar/kecil ikut mengabaikan public/assets/ dan situs kehilangan gambar.
+/Assets/
 # tangkapan layar hasil verifikasi
-preview/
+/preview/
