@@ -1,0 +1,50 @@
+---
+import Base from '../layouts/Base.astro';
+import { ui, site, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+
+const rows = [
+  { label: t.contact.email, value: site.email, url: `mailto:${site.email}`, copy: site.email },
+  { label: t.contact.whatsapp, value: site.phone, url: site.whatsapp, copy: site.phone },
+  { label: t.contact.linkedin, value: 'dandie-lucky-maulana', url: site.linkedin, copy: site.linkedin },
+  ...(site.instagram
+    ? [{ label: t.contact.instagram, value: site.instagram.split('/').pop() ?? '', url: site.instagram, copy: site.instagram }]
+    : []),
+];
+---
+
+<Base lang={lang} title={t.contact.title} description={t.contact.description} noCta>
+  <section class="section" style="padding-top:calc(var(--header-h) + clamp(2.5rem,7vw,6rem))">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>{t.contact.eyebrow}</p>
+        <h1 data-reveal style="--i:1;max-width:20ch">{t.contact.headline}</h1>
+        <p class="lede" data-reveal style="--i:2">{t.contact.body}</p>
+      </div>
+
+      <div class="timeline" style="margin-top:0">
+        {rows.map((r, i) => (
+          <div class="timeline-item" data-reveal style={`--i:${i}`}>
+            <span class="t-year">{r.label}</span>
+            <span style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:baseline;justify-content:space-between">
+              <a class="link" href={r.url} target={r.url.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
+                {r.value}
+              </a>
+              <button class="filter" type="button" data-copy={r.copy}>{t.ui.copyEmail}</button>
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div class="cta-actions" data-reveal>
+        <a class="btn" href={site.cv} download>{t.ui.cv} <span aria-hidden="true">↓</span></a>
+      </div>
+    </div>
+  </section>
+</Base>

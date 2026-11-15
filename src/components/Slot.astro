@@ -1,0 +1,34 @@
+---
+import { assetExists } from '../lib/work';
+import assets from '../data/assets.json';
+
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  ratio?: string;
+  flag?: boolean;
+}
+
+const { src, alt, caption, ratio = '4 / 3', flag = true } = Astro.props;
+const clean = src.startsWith('/') ? src.slice(1) : src;
+const exists = assetExists(src);
+const isPlaceholder = (assets as Record<string, boolean>)[`/${clean}`] === true;
+---
+
+<figure class="slot-figure" style={`--ratio:${ratio}`}>
+  {exists ? (
+    <a class="slot-media" href={`/${clean}`} data-lightbox-link aria-label={alt}>
+      <img src={`/${clean}`} alt={alt} loading="lazy" decoding="async" width="1200" height="900" />
+      {flag && isPlaceholder && <span class="asset-flag">slot aset</span>}
+    </a>
+  ) : (
+    <div class="slot">
+      <div class="slot-inner">
+        <span class="slot-label">Slot aset</span>
+        <p>Taruh file di <code>public/{clean}</code></p>
+      </div>
+    </div>
+  )}
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

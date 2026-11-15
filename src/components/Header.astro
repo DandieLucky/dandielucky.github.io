@@ -1,0 +1,59 @@
+---
+import { ui, href, otherLangPath, langLabel, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const pathname = Astro.url.pathname;
+const other: Lang = lang === 'id' ? 'en' : 'id';
+
+const links = [
+  { path: '/work', label: t.nav.work },
+  { path: '/about', label: t.nav.about },
+  { path: '/lab', label: t.nav.lab },
+  { path: '/contact', label: t.nav.contact },
+];
+
+const normalized = pathname.replace(/\/$/, '') || '/';
+const isActive = (p: string) => {
+  const target = href(p, lang);
+  return normalized === target || normalized.startsWith(`${target}/`);
+};
+---
+
+<header class="site-header" data-header>
+  <div class="wrap header-inner">
+    <a class="brand" href={href('/', lang)} aria-label="Dandie Lucky Maulana — beranda">
+      Dandie Lucky Maulana <span>Portfolio</span>
+    </a>
+
+    <nav class="nav" id="site-nav" data-nav aria-label="Navigasi utama">
+      {links.map((l) => (
+        <a href={href(l.path, lang)} aria-current={isActive(l.path) ? 'page' : undefined}>{l.label}</a>
+      ))}
+    </nav>
+
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label={t.ui.theme} title={t.ui.theme}>
+        <span class="i-moon" aria-hidden="true">☾</span>
+        <span class="i-sun" aria-hidden="true">☀</span>
+      </button>
+
+      <div class="lang" role="group" aria-label={t.ui.langSwitch}>
+        <a href={href(pathname.replace(/^\/en(?=\/|$)/, '') || '/', 'id')} aria-current={lang === 'id' ? 'true' : 'false'} hreflang="id">
+          {langLabel.id}
+        </a>
+        <a href={otherLangPath(pathname, 'en')} aria-current={lang === 'en' ? 'true' : 'false'} hreflang="en">
+          {langLabel.en}
+        </a>
+      </div>
+
+      <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-nav">
+        {t.nav.menu}
+      </button>
+    </div>
+  </div>
+</header>

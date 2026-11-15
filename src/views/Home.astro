@@ -1,0 +1,128 @@
+---
+import Base from '../layouts/Base.astro';
+import WorkRow from '../components/WorkRow.astro';
+import Slot from '../components/Slot.astro';
+import { ui, href, type Lang } from '../i18n/ui';
+import { getFeatured } from '../lib/work';
+import { disciplineLabel } from '../data/disciplines';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const featured = await getFeatured(lang, 6);
+
+const heroParts = t.home.heroLines.map((line) =>
+  line.split('*').map((part, i) => ({ text: part, em: i % 2 === 1 }))
+);
+
+const pad = (n: number) => String(n + 1).padStart(2, '0');
+---
+
+<Base lang={lang} title={t.home.title} description={t.home.description}>
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <h1 class="hero-title">
+            {heroParts.map((parts) => (
+              <span class="hero-line">
+                <span>{parts.map((p) => (p.em ? <em>{p.text}</em> : p.text))}</span>
+              </span>
+            ))}
+          </h1>
+        </div>
+
+        <aside class="hero-aside">
+          <p class="availability"><span class="dot" aria-hidden="true"></span>{t.ui.available}</p>
+          <p class="lede">{t.home.heroLede}</p>
+          <dl class="hero-meta">
+            {t.home.meta.map((m) => (
+              <div>
+                <dt>{m.label}</dt>
+                <dd>{m.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </aside>
+      </div>
+
+      <p class="scroll-cue"><span class="bar" aria-hidden="true"></span>{t.ui.scroll}</p>
+    </div>
+  </section>
+
+  <section class="section" id="work">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>{t.home.workEyebrow}</p>
+        <h2 data-reveal style="--i:1">{t.home.workTitle}</h2>
+        <p class="lede" data-reveal style="--i:2">{t.home.workLede}</p>
+      </div>
+
+      <div class="work-list">
+        {featured.map((p, i) => (
+          <WorkRow
+            num={pad(i)}
+            title={p.data.title}
+            meta={[p.data.client, ...p.data.disciplines.slice(0, 2).map((d) => disciplineLabel(d, lang))]}
+            year={p.data.year}
+            url={href(`/work/${p.data.slug}`, lang)}
+            preview={p.data.cover ?? ''}
+            previewLabel={p.data.client}
+            index={i}
+          />
+        ))}
+      </div>
+
+      <p style="margin-top:2rem" data-reveal>
+        <a class="link link--arrow" href={href('/work', lang)}>
+          {t.ui.seeAll} <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>{t.home.approachEyebrow}</p>
+        <h2 data-reveal style="--i:1">{t.home.approachTitle}</h2>
+      </div>
+
+      <div class="steps">
+        {t.home.approachSteps.map((s, i) => (
+          <article class="step" data-reveal style={`--i:${i}`}>
+            <span class="step-n">{s.n}</span>
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="about-grid">
+        <div data-reveal>
+          <Slot src="/assets/about/portrait.jpg" alt="Foto Dandie Lucky Maulana" ratio="4 / 5" />
+        </div>
+
+        <div>
+          <p class="eyebrow" data-reveal>{t.home.aboutEyebrow}</p>
+          <h2 data-reveal style="--i:1;margin-top:0.75rem">{t.home.aboutTitle}</h2>
+          {t.home.aboutBody.map((p, i) => (
+            <p class="lede" style={`max-width:58ch;margin-top:1rem;--i:${i + 2}`} data-reveal>{p}</p>
+          ))}
+          <p style="margin-top:1.5rem" data-reveal>
+            <a class="link link--arrow" href={href('/about', lang)}>
+              {t.nav.about} <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>

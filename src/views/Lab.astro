@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import { ui, type Lang } from '../i18n/ui';
+import { lab } from '../data/lab';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+
+<Base lang={lang} title={t.lab.title} description={t.lab.description}>
+  <section class="section" style="padding-top:calc(var(--header-h) + clamp(2.5rem,7vw,6rem))">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>{t.lab.eyebrow}</p>
+        <h1 data-reveal style="--i:1;max-width:22ch">{t.lab.lede}</h1>
+      </div>
+
+      <div class="lab-grid">
+        {lab.map((item, i) => (
+          <article class="lab-card" data-reveal style={`--i:${i}`}>
+            <div>
+              <span class="mono muted">{item.n}</span>
+              <h3 style="margin-top:0.5rem">{item.title[lang]}</h3>
+              <p style="margin-top:0.75rem">
+                <span class="tag">{t.lab.status}: {item.status[lang]}</span>
+              </p>
+            </div>
+
+            <div>
+              <p style="color:var(--ink-2)">{item.body[lang]}</p>
+              <p class="mono muted" style="margin-top:1rem">{t.lab.stack}</p>
+              <div class="tags" style="margin-top:0.5rem">
+                {item.stack.map((s) => <span class="tag">{s}</span>)}
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,31 @@
+---
+interface Props {
+  num: string;
+  title: string;
+  meta: string[];
+  year: string;
+  url: string;
+  preview: string;
+  previewLabel: string;
+  index?: number;
+}
+
+const { num, title, meta, year, url, preview, previewLabel, index = 0 } = Astro.props;
+---
+
+<a
+  class="work-row"
+  href={url}
+  data-preview={preview}
+  data-preview-label={previewLabel}
+  data-reveal
+  style={`--i:${index}`}
+>
+  <span class="num">{num}</span>
+  <span>
+    <span class="title">{title}</span>
+    <span class="meta">{meta.map((m) => <span>{m}</span>)}</span>
+  </span>
+  <span class="year">{year}</span>
+  <span class="go" aria-hidden="true">↗</span>
+</a>

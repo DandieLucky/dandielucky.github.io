@@ -1,0 +1,41 @@
+---
+import { assetExists } from '../lib/work';
+
+interface Props {
+  href: string;
+  title: string;
+  meta: string[];
+  cover: string;
+  tags: string[];
+  status?: 'live' | 'progress';
+  badge?: string;
+  index?: number;
+}
+
+const { href, title, meta, cover, tags, status = 'live', badge, index = 0 } = Astro.props;
+const clean = cover.startsWith('/') ? cover.slice(1) : cover;
+const hasCover = assetExists(cover);
+---
+
+<a class="card" href={href} data-tags={tags.join(' ')} data-reveal style={`--i:${index}`}>
+  <div class="card-media">
+    {hasCover ? (
+      <img src={`/${clean}`} alt={title} loading="lazy" decoding="async" width="1200" height="900" />
+    ) : (
+      <div class="slot" style="height:100%;margin:0">
+        <div class="slot-inner">
+          <span class="slot-label">Slot cover</span>
+          <p><code>public/{clean}</code></p>
+        </div>
+      </div>
+    )}
+  </div>
+
+  <div class="card-body">
+    <div>
+      <span class="card-title">{title}</span>
+      <span class="card-meta">{meta.join(' · ')}</span>
+    </div>
+    {badge ? <span class="badge">{badge}</span> : status === 'progress' ? <span class="badge">Segera</span> : null}
+  </div>
+</a>

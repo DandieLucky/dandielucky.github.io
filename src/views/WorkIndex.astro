@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { ui, href, type Lang } from '../i18n/ui';
+import { getWork } from '../lib/work';
+import { disciplines, disciplineLabel } from '../data/disciplines';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const projects = await getWork(lang);
+
+const used = disciplines.filter((d) => projects.some((p) => p.data.disciplines.includes(d.id)));
+---
+
+<Base lang={lang} title={t.work.title} description={t.work.description}>
+  <section class="section" style="padding-top:calc(var(--header-h) + clamp(2.5rem,7vw,6rem))">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>{t.work.eyebrow} — {String(projects.length).padStart(2, '0')}</p>
+        <h1 data-reveal style="--i:1">{lang === 'id' ? 'Semua karya' : 'All work'}</h1>
+        <p class="lede" data-reveal style="--i:2">{t.work.lede}</p>
+      </div>
+
+      <div class="filters" role="group" aria-label="Filter karya" data-reveal>
+        <button class="filter" type="button" data-filter="all" aria-pressed="true">{t.work.all}</button>
+        {used.map((d) => (
+          <button class="filter" type="button" data-filter={d.id} aria-pressed="false">
+            {disciplineLabel(d.id, lang)}
+          </button>
+        ))}
+      </div>
+
+      <div class="card-grid" data-card-grid>
+        {projects.map((p, i) => (
+          <ProjectCard
+            href={href(`/work/${p.data.slug}`, lang)}
+            title={p.data.title}
+            meta={[p.data.year, p.data.client]}
+            cover={p.data.cover ?? ''}
+            tags={p.data.disciplines}
+            status={p.data.status}
+            index={i}
+          />
+        ))}
+      </div>
+
+      <p class="muted" data-filter-empty hidden style="margin-top:2rem">{t.work.empty}</p>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,40 @@
+---
+import { assetExists } from '../lib/work';
+import assets from '../data/assets.json';
+
+interface Props {
+  before: string;
+  after: string;
+  labelBefore?: string;
+  labelAfter?: string;
+  caption?: string;
+}
+
+const { before, after, labelBefore = 'Sebelum', labelAfter = 'Sesudah', caption } = Astro.props;
+
+const strip = (s: string) => (s.startsWith('/') ? s.slice(1) : s);
+const hasBefore = assetExists(before);
+const hasAfter = assetExists(after);
+const marked = (s: string) => (assets as Record<string, boolean>)[`/${strip(s)}`] === true;
+---
+
+<figure class="slot-figure" style="--ratio: 4 / 3">
+  {hasBefore && hasAfter ? (
+    <div class="ba" data-ba style="--pos:50%">
+      <img class="ba-before" src={`/${strip(before)}`} alt={labelBefore} loading="lazy" decoding="async" />
+      <img class="ba-after" src={`/${strip(after)}`} alt={labelAfter} loading="lazy" decoding="async" />
+      <span class="ba-tag ba-tag--before">{labelBefore}</span>
+      <span class="ba-tag ba-tag--after">{labelAfter}</span>
+      <span class="ba-handle" aria-hidden="true"></span>
+      {marked(before) && <span class="asset-flag asset-flag--ba">slot aset</span>}
+    </div>
+  ) : (
+    <div class="slot">
+      <div class="slot-inner">
+        <span class="slot-label">Slot before / after</span>
+        <p>Taruh <code>public/{strip(before)}</code> dan <code>public/{strip(after)}</code></p>
+      </div>
+    </div>
+  )}
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

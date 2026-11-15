@@ -1,0 +1,46 @@
+---
+import { assetExists } from '../lib/work';
+import assets from '../data/assets.json';
+
+interface Item {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+interface Props {
+  items: Item[];
+  columns?: 2 | 3;
+}
+
+const { items, columns = 2 } = Astro.props;
+
+const assetMap = assets as Record<string, boolean>;
+const isPlaceholder = (src: string) => assetMap[`/${src}`] === true;
+const strip = (s: string) => (s.startsWith('/') ? s.slice(1) : s);
+---
+
+<div class={columns === 3 ? 'gallery gallery--3' : 'gallery'}>
+  {items.map((item) => {
+    const clean = strip(item.src);
+    const exists = assetExists(item.src);
+    return (
+      <figure>
+        {exists ? (
+          <a class="slot-media" href={`/${clean}`} data-lightbox-link aria-label={item.alt}>
+            <img src={`/${clean}`} alt={item.alt} loading="lazy" decoding="async" width="1200" height="900" />
+            {isPlaceholder && <span class="asset-flag">slot aset</span>}
+          </a>
+        ) : (
+          <div class="slot" style="min-height:180px">
+            <div class="slot-inner">
+              <span class="slot-label">Slot aset</span>
+              <p><code>public/{clean}</code></p>
+            </div>
+          </div>
+        )}
+        {item.caption && <figcaption>{item.caption}</figcaption>}
+      </figure>
+    );
+  })}
+</div>

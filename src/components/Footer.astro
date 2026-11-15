@@ -1,0 +1,52 @@
+---
+import { ui, href, site, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  noCta?: boolean;
+}
+
+const { lang, noCta = false } = Astro.props;
+const t = ui[lang];
+const year = new Date().getFullYear();
+
+const socials = [
+  { label: 'Email', url: `mailto:${site.email}` },
+  { label: 'WhatsApp', url: site.whatsapp },
+  { label: 'LinkedIn', url: site.linkedin },
+  ...(site.instagram ? [{ label: 'Instagram', url: site.instagram }] : []),
+];
+---
+
+{!noCta && (
+  <section class="cta" id="contact-cta">
+    <div class="wrap">
+      <p class="eyebrow" data-reveal>{t.home.ctaEyebrow}</p>
+      <h2 class="cta-title" data-reveal style="--i:1">
+        {t.home.ctaTitle.split('*').map((part, i) => (i % 2 === 1 ? <em>{part}</em> : part))}
+      </h2>
+      <p class="lede" style="color:rgba(248,246,241,.72);margin-top:1.25rem" data-reveal>{t.home.ctaBody}</p>
+
+      <div class="cta-actions" data-reveal style="--i:2">
+        <a class="btn" href={`mailto:${site.email}`}>
+          {site.email} <span aria-hidden="true">↗</span>
+        </a>
+        <button class="btn btn--ghost" type="button" data-copy={site.email}>{t.ui.copyEmail}</button>
+        <a class="btn btn--ghost" href={href('/contact', lang)}>{t.nav.contact}</a>
+      </div>
+    </div>
+  </section>
+)}
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <p style="margin:0">© {year} Dandie Lucky Maulana — {t.ui.builtWith}</p>
+    <div class="footer-links">
+      {socials.map((s) => (
+        <a href={s.url} target={s.url.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">{s.label}</a>
+      ))}
+      <a href={href('/work', lang)}>{t.nav.work}</a>
+      <a href="#main" data-to-top>{t.ui.top} ↑</a>
+    </div>
+  </div>
+</footer>

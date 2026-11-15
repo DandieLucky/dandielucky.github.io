@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import { ui, href, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+
+<Base lang={lang} title={t.notFound.title} description={t.notFound.body}>
+  <section class="notfound wrap">
+    <p class="code">404</p>
+    <h1>{t.notFound.headline}</h1>
+    <p class="lede" style="margin-inline:auto">{t.notFound.body}</p>
+    <p>
+      <a class="btn btn--ghost" href={href('/', lang)}>{t.notFound.back}</a>
+    </p>
+  </section>
+</Base>

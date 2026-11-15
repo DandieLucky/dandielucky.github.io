@@ -1,0 +1,449 @@
+/* =========================================================
+   Interactions: header, reveal, hover preview, filters,
+   lightbox, before/after slider, copy-to-clipboard, TOC
+   Vanilla JS. Re-initialised on every Astro page navigation.
+   ========================================================= */
+
+const cleanups = [];
+
+const reduceMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const finePointer = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+/* ---------- header + scroll progress ---------- */
+function initHeader() {
+  const header = document.querySelector('[data-header]');
+  const bar = document.querySelector('.progress');
+  if (!header) return;
+
+  let last = window.scrollY;
+  let ticking = false;
+
+  const update = () => {
+    const y = window.scrollY;
+    header.classList.toggle('is-scrolled', y > 12);
+
+    if (y > 260 && y > last) header.classList.add('is-hidden');
+    else header.classList.remove('is-hidden');
+
+    if (bar) {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = max > 0 ? Math.min(y / max, 1) : 0;
+      bar.style.transform = `scaleX(${ratio})`;
+    }
+
+    last = y;
+    ticking = false;
+  };
+
+  const onScroll = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(update);
+    }
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  update();
+  cleanups.push(() => window.removeEventListener('scroll', onScroll));
+}
+
+/* ---------- mobile menu ---------- */
+function initMenu() {
+  const toggle = document.querySelector('[data-menu-toggle]');
+  const nav = document.querySelector('[data-nav]');
+  if (!toggle || !nav) return;
+
+  toggle.addEventListener('click', () => {
+    const open = nav.classList.toggle('is-open');
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  nav.querySelectorAll('a').forEach((a) =>
+    a.addEventListener('click', () => {
+      nav.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+    })
+  );
+}
+
+/* ---------- reveal on scroll ---------- */
+function initReveal() {
+  const items = Array.from(document.querySelectorAll('[data-reveal]'));
+  if (!items.length) return;
+
+  if (reduceMotion() || !('IntersectionObserver' in window)) {
+    items.forEach((el) => el.classList.add('is-in'));
+    return;
+  }
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    },
+    { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+  );
+
+  items.forEach((el) => io.observe(el));
+  cleanups.push(() => io.disconnect());
+
+  // apa pun yang sudah masuk viewport tampil langsung (deep link / restore scroll)
+  requestAnimationFrame(() => {
+    items.forEach((el) => {
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.92) el.classList.add('is-in');
+    });
+  });
+
+  // jaring pengaman: kalau observer gagal (browser aneh / scroll jump), jangan
+  // sampai konten tetap tak terlihat
+  const safety = window.setTimeout(() => {
+    items.forEach((el) => {
+      if (el.getBoundingClientRect().top < window.innerHeight) el.classList.add('is-in');
+    });
+  }, 2500);
+  cleanups.push(() => window.clearTimeout(safety));
+}
+
+/* ---------- hover preview following the cursor ---------- */
+function initHoverPreview() {
+  const preview = document.querySelector('[data-hover-preview]');
+  const img = document.querySelector('[data-preview-img]');
+  const label = document.querySelector('[data-preview-label]');
+  const rows = Array.from(document.querySelectorAll('[data-preview]'));
+  if (!preview || !img || !rows.length || !finePointer() || reduceMotion()) return;
+
+  let tx = 0;
+  let ty = 0;
+  let cx = 0;
+  let cy = 0;
+  let raf = 0;
+  let active = false;
+
+  const loop = () => {
+    cx += (tx - cx) * 0.14;
+    cy += (ty - cy) * 0.14;
+    preview.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%) scale(${active ? 1 : 0.94})`;
+    raf = requestAnimationFrame(loop);
+  };
+
+  const onMove = (e) => {
+    tx = e.clientX;
+    ty = e.clientY;
+  };
+
+  rows.forEach((row) => {
+    row.addEventListener('mouseenter', () => {
+      const src = row.getAttribute('data-preview');
+      if (!src) return;
+      img.src = src;
+      if (label) label.textContent = row.getAttribute('data-preview-label') || '';
+      active = true;
+      preview.classList.add('is-active');
+      if (!raf) raf = requestAnimationFrame(loop);
+    });
+
+    row.addEventListener('mouseleave', () => {
+      active = false;
+      preview.classList.remove('is-active');
+    });
+  });
+
+  window.addEventListener('mousemove', onMove, { passive: true });
+  cleanups.push(() => {
+    window.removeEventListener('mousemove', onMove);
+    if (raf) cancelAnimationFrame(raf);
+  });
+}
+
+/* ---------- work filters ---------- */
+function initFilters() {
+  const buttons = Array.from(document.querySelectorAll('[data-filter]'));
+  const grid = document.querySelector('[data-card-grid]');
+  if (!buttons.length || !grid) return;
+
+  const cards = Array.from(grid.querySelectorAll('.card'));
+  const empty = document.querySelector('[data-filter-empty]');
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const value = btn.getAttribute('data-filter');
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+
+      let visible = 0;
+      cards.forEach((card, i) => {
+        const tags = (card.getAttribute('data-tags') || '').split(' ');
+        const show = value === 'all' || tags.includes(value);
+        card.classList.toggle('is-filtered-out', !show);
+        if (show) {
+          visible += 1;
+          card.style.setProperty('--i', String(visible - 1));
+          if (!reduceMotion()) {
+            card.classList.remove('is-in');
+            requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('is-in')));
+          }
+        }
+      });
+
+      if (empty) empty.hidden = visible > 0;
+      void i;
+    });
+  });
+}
+
+/* ---------- lightbox ---------- */
+function initLightbox() {
+  const box = document.querySelector('[data-lightbox]');
+  const boxImg = document.querySelector('[data-lightbox-img]');
+  const close = document.querySelector('[data-lightbox-close]');
+  const links = Array.from(document.querySelectorAll('[data-lightbox-link]'));
+  if (!box || !boxImg || !links.length) return;
+
+  let opener = null;
+
+  const open = (src, alt, el) => {
+    boxImg.src = src;
+    boxImg.alt = alt || '';
+    box.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    opener = el;
+    close && close.focus();
+  };
+
+  const shut = () => {
+    box.classList.remove('is-open');
+    document.body.style.overflow = '';
+    if (opener) opener.focus();
+  };
+
+  links.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      open(link.getAttribute('href'), link.getAttribute('aria-label'), link);
+    });
+  });
+
+  close && close.addEventListener('click', shut);
+  box.addEventListener('click', (e) => {
+    if (e.target === box) shut();
+  });
+
+  const onKey = (e) => {
+    if (e.key === 'Escape' && box.classList.contains('is-open')) shut();
+  };
+  document.addEventListener('keydown', onKey);
+  cleanups.push(() => document.removeEventListener('keydown', onKey));
+}
+
+/* ---------- before / after slider ---------- */
+function initBeforeAfter() {
+  const sliders = Array.from(document.querySelectorAll('[data-ba]'));
+  if (!sliders.length) return;
+
+  sliders.forEach((slider) => {
+    let dragging = false;
+
+    const setFromEvent = (clientX) => {
+      const rect = slider.getBoundingClientRect();
+      const ratio = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1);
+      slider.style.setProperty('--pos', `${(ratio * 100).toFixed(2)}%`);
+    };
+
+    slider.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      slider.setPointerCapture(e.pointerId);
+      setFromEvent(e.clientX);
+    });
+
+    slider.addEventListener('pointermove', (e) => {
+      if (dragging) setFromEvent(e.clientX);
+    });
+
+    const stop = (e) => {
+      dragging = false;
+      if (slider.hasPointerCapture?.(e.pointerId)) slider.releasePointerCapture(e.pointerId);
+    };
+    slider.addEventListener('pointerup', stop);
+    slider.addEventListener('pointercancel', stop);
+
+    // keyboard accessibility
+    slider.addEventListener('keydown', (e) => {
+      const current = parseFloat(getComputedStyle(slider).getPropertyValue('--pos')) || 50;
+      if (e.key === 'ArrowLeft') slider.style.setProperty('--pos', `${Math.max(current - 4, 0)}%`);
+      if (e.key === 'ArrowRight') slider.style.setProperty('--pos', `${Math.min(current + 4, 100)}%`);
+    });
+  });
+}
+
+/* ---------- copy to clipboard ---------- */
+function initCopy() {
+  const toast = document.querySelector('[data-toast]');
+  const buttons = Array.from(document.querySelectorAll('[data-copy]'));
+  if (!buttons.length) return;
+
+  const flash = (message) => {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    window.setTimeout(() => toast.classList.remove('is-visible'), 2200);
+  };
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const value = btn.getAttribute('data-copy') || '';
+      const original = btn.textContent;
+      try {
+        await navigator.clipboard.writeText(value);
+        flash(toast?.dataset.copied || 'Copied');
+      } catch {
+        flash(value);
+      }
+      if (btn.classList.contains('filter')) {
+        btn.textContent = '✓';
+        window.setTimeout(() => (btn.textContent = original), 1400);
+      }
+    });
+  });
+}
+
+/* ---------- case study table of contents ---------- */
+function initToc() {
+  const links = Array.from(document.querySelectorAll('[data-toc-link]'));
+  const main = document.querySelector('[data-case-main]');
+  if (!links.length || !main) return;
+
+  const heads = Array.from(main.querySelectorAll('h2'));
+  if (!heads.length) return;
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((l) =>
+          l.classList.toggle('is-active', l.getAttribute('data-toc-link') === entry.target.id)
+        );
+      });
+    },
+    { rootMargin: '-15% 0px -70% 0px' }
+  );
+
+  heads.forEach((h) => io.observe(h));
+  cleanups.push(() => io.disconnect());
+}
+
+/* ---------- card hover video ---------- */
+function initCardVideos() {
+  if (!finePointer() || reduceMotion()) return;
+  document.querySelectorAll('.card').forEach((card) => {
+    const video = card.querySelector('video');
+    if (!video) return;
+    card.addEventListener('mouseenter', () => {
+      video.classList.add('is-playing');
+      video.play().catch(() => {});
+    });
+    card.addEventListener('mouseleave', () => {
+      video.classList.remove('is-playing');
+      video.pause();
+    });
+  });
+}
+
+/* ---------- tema gelap / terang ---------- */
+// Astro menyalin atribut <html> dari dokumen baru saat pindah halaman, jadi
+// data-theme bisa hilang. localStorage adalah sumber kebenaran: pasang ulang
+// atributnya sebelum & sesudah swap, bukan hanya saat init.
+const storedTheme = () => {
+  try {
+    return localStorage.getItem('theme');
+  } catch (e) {
+    return null;
+  }
+};
+
+function applyStoredTheme() {
+  const root = document.documentElement;
+  if (storedTheme() === 'dark') root.dataset.theme = 'dark';
+  else delete root.dataset.theme;
+}
+
+if (!window.__themeBound) {
+  window.__themeBound = true;
+  document.addEventListener('astro:before-swap', applyStoredTheme);
+  document.addEventListener('astro:after-swap', applyStoredTheme);
+}
+
+function initTheme() {
+  const btn = document.querySelector('[data-theme-toggle]');
+  if (!btn) return;
+
+  applyStoredTheme();
+
+  const root = document.documentElement;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const isDark = () => root.dataset.theme === 'dark';
+
+  const paint = () => {
+    btn.setAttribute('aria-pressed', String(isDark()));
+    if (meta) meta.setAttribute('content', isDark() ? '#0e1116' : '#f8f6f1');
+  };
+
+  const onClick = () => {
+    if (isDark()) {
+      delete root.dataset.theme;
+      try {
+        localStorage.setItem('theme', 'light');
+      } catch (e) {}
+    } else {
+      root.dataset.theme = 'dark';
+      try {
+        localStorage.setItem('theme', 'dark');
+      } catch (e) {}
+    }
+    paint();
+  };
+
+  btn.addEventListener('click', onClick);
+  cleanups.push(() => btn.removeEventListener('click', onClick));
+  paint();
+}
+
+/* ---------- run ---------- */
+function initAll() {
+  while (cleanups.length) {
+    const fn = cleanups.pop();
+    try {
+      fn();
+    } catch {
+      /* noop */
+    }
+  }
+  initHeader();
+  initMenu();
+  initReveal();
+  initHoverPreview();
+  initFilters();
+  initLightbox();
+  initBeforeAfter();
+  initCopy();
+  initToc();
+  initCardVideos();
+  initTheme();
+
+  // keep the copied-toast message localised
+  const toast = document.querySelector('[data-toast]');
+  if (toast) {
+    toast.dataset.copied =
+      document.documentElement.lang === 'en' ? 'Email copied' : 'Email tersalin';
+  }
+}
+
+document.addEventListener('astro:page-load', initAll);
+if (!document.querySelector('[data-header]')) {
+  // fallback for browsers without view transitions support
+  document.addEventListener('DOMContentLoaded', initAll);
+}

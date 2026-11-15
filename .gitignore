@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+npm-debug.log*
+
+# materi mentah karya (114 MB) — tetap di Mac, tidak ikut ke GitHub
+Assets/
+# tangkapan layar hasil verifikasi
+preview/

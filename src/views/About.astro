@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import Slot from '../components/Slot.astro';
+import { ui, href, site, type Lang } from '../i18n/ui';
+import { timeline, skills } from '../data/timeline';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = ui[lang];
+const pad = (n: number) => String(n + 1).padStart(2, '0');
+---
+
+<Base lang={lang} title={t.about.title} description={t.about.description}>
+  <section class="section" style="padding-top:calc(var(--header-h) + clamp(2.5rem,7vw,6rem))">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-reveal>{t.about.eyebrow}</p>
+        <h1 data-reveal style="--i:1;max-width:26ch">{t.about.headline}</h1>
+      </div>
+
+      <div class="about-grid">
+        <div data-reveal>
+          <Slot src="/assets/about/portrait.jpg" alt="Dandie Lucky Maulana" ratio="4 / 5" />
+          <p class="mono muted" style="margin-top:0.75rem">
+            {lang === 'id' ? 'Jakarta Selatan · Semester 6 · IPK 3.86/4.00' : 'South Jakarta · Semester 6 · GPA 3.86/4.00'}
+          </p>
+        </div>
+
+        <div>
+          {t.about.paragraphs.map((p, i) => (
+            <p class="lede" style={`max-width:60ch;margin-bottom:1.25rem;--i:${i}`} data-reveal>{p}</p>
+          ))}
+
+          <div class="cta-actions" style="margin-top:2rem;--i:3" data-reveal>
+            <a class="btn" href={site.cv} download>
+              {t.ui.cv} <span aria-hidden="true">↓</span>
+            </a>
+            <a class="btn btn--ghost" href={`mailto:${site.email}`}>{site.email}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <h2 data-reveal>{t.about.timelineTitle}</h2>
+      <div class="timeline" style="margin-top:2rem">
+        {timeline.map((item, i) => (
+          <div class="timeline-item" data-reveal style={`--i:${Math.min(i, 5)}`}>
+            <span class="t-year">{item.year || pad(i)}</span>
+            <span>
+              <span class="t-role">{item.role[lang]}</span><br />
+              <span class="t-org">{item.org[lang]}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <h2 data-reveal>{t.about.skillsTitle}</h2>
+      <div class="skills-grid">
+        {skills.map((block, i) => (
+          <div class="skill-block" data-reveal style={`--i:${i}`}>
+            <h3>{block.title[lang]}</h3>
+            <ul>
+              {block.items.map((it) => <li>{it}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

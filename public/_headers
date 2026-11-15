@@ -1,0 +1,27 @@
+# Header HTTP untuk Cloudflare Pages (dibaca otomatis saat deploy, tidak perlu setting di dashboard).
+#
+# Aturannya sengaja konservatif supaya tidak pernah membuat situs gagal tampil:
+# HTML selalu divalidasi ulang, aset ber-hash di-cache selamanya, dan gambar yang
+# kamu ganti-ganti hanya di-cache singkat agar perubahan langsung terlihat.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Cache-Control: public, max-age=0, must-revalidate
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/work/*
+  Cache-Control: public, max-age=600
+
+/assets/about/*
+  Cache-Control: public, max-age=600
+
+/assets/og.png
+  Cache-Control: public, max-age=600
+
+/assets/cv/*
+  Cache-Control: public, max-age=600
