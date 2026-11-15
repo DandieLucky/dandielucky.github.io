@@ -185,7 +185,14 @@ function langkah() {
   // C. pembiasan konten mengikuti kemiringan air
   terapkanPembiasan(biasBias());
 
-  if (maks < 0.28) {
+  // hening = puncak kecil DAN sudah tidak ada gundukan tersisa di kisi
+  let sisa = 0;
+  for (let i = KOLOM; i < a.length - KOLOM; i += 7) {
+    const v = a[i] < 0 ? -a[i] : a[i];
+    if (v > sisa) sisa = v;
+  }
+
+  if (maks < 1.5 && sisa < 12) {
     tenang = true;
     jalan = false;
     ctx.clearRect(0, 0, kanvas.width, kanvas.height);
