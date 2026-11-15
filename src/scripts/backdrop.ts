@@ -46,7 +46,7 @@ const ambil = (nama: string, cadangan: number) => {
   const v = parseFloat(document.documentElement.dataset[nama] ?? '');
   return Number.isFinite(v) ? v : cadangan;
 };
-const damping = () => ambil('rippleDamping', 0.986);
+const damping = () => ambil('rippleDamping', 0.9975);
 const radiusJatuh = () => ambil('rippleRadius', 6);
 const kuatKlik = () => ambil('rippleKuat', 2400);
 const kuatHover = () => ambil('rippleHover', 300);
@@ -185,7 +185,7 @@ function langkah() {
   // C. pembiasan konten mengikuti kemiringan air
   terapkanPembiasan(biasBias());
 
-  if (maks < 0.9) {
+  if (maks < 0.28) {
     tenang = true;
     jalan = false;
     ctx.clearRect(0, 0, kanvas.width, kanvas.height);
@@ -198,10 +198,7 @@ function langkah() {
 }
 
 function putar() {
-  // dua langkah per bingkai: riak menyebar lebih cepat & jelas terlihat,
-  // bukan merayap pelan seperti di kolam raksasa
   langkah();
-  if (jalan) langkah();
 }
 
 // ---------- pembiasan konten ----------
