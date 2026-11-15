@@ -23,11 +23,9 @@
   --inverse-fg: #f8f6f1;
   --accent-fg: #ffffff;
 
-  /* air bening: biru-hijau segar untuk latar bergelombang */
-  --air-1: #2a6f77;
-  --air-2: #4f9ba3;
-  --air-soft: rgba(42, 111, 119, 0.14);
-  --air-alfa: 0.30;
+  /* jentikan air di kursor — latar dibiarkan kosong */
+  --jentik-warna: #2a6f77;
+  --jentik-alfa: 0.34;
 
   --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
@@ -88,9 +86,10 @@ body {
   overflow-x: hidden;
 }
 
-/* ---------- latar air ----------
-   Tirai gelombang digambar di kanvas .backdrop (src/scripts/backdrop.ts).
-   Cadangan CSS untuk gerak minim / tanpa JS: garis gelombang statis. */
+/* ---------- latar & jentikan air ----------
+   Latar sengaja KOSONG: tidak ada garis, kisi, atau gelombang yang bisa
+   menutupi teks. Hanya kanvas .backdrop yang menggambar cincin air di kursor
+   (src/scripts/backdrop.ts) dan menghapus dirinya saat cincin habis. */
 body { isolation: isolate; }
 
 .backdrop {
@@ -98,57 +97,27 @@ body { isolation: isolate; }
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.95;
-  transition: opacity 0.6s var(--ease);
-}
-[data-theme='dark'] .backdrop { opacity: 0.85; }
-
-/* tanpa JS atau saat gerak diminimalkan */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0;
-  background-image: repeating-linear-gradient(
-      174deg,
-      var(--air-soft) 0 1px,
-      transparent 1px 34px
-    ),
-    repeating-linear-gradient(186deg, var(--air-soft) 0 1px, transparent 1px 61px);
-}
-@media (prefers-reduced-motion: reduce) {
-  body::after { opacity: 0.55; }
 }
 
-/* HP: gelombang lebih renggang + bayangan samar foto profil di sudut */
+/* HP: hanya bayangan samar foto profil di sudut, tanpa pola apa pun */
 @media (max-width: 40rem) {
-  body::after {
-    background-image: repeating-linear-gradient(
-        174deg,
-        var(--air-soft) 0 1px,
-        transparent 1px 46px
-      ),
-      repeating-linear-gradient(186deg, var(--air-soft) 0 1px, transparent 1px 82px);
-  }
   body {
     background-image: radial-gradient(
-        120% 60% at 82% 4%,
-        rgba(42, 111, 119, 0.16),
-        rgba(42, 111, 119, 0) 62%
+        120% 60% at 84% 2%,
+        rgba(42, 111, 119, 0.10),
+        rgba(42, 111, 119, 0) 58%
       ),
       url('/assets/hero/ghost.jpg');
     background-repeat: no-repeat, no-repeat;
-    background-position: center top, 114% 2rem;
-    background-size: cover, 20rem auto;
+    background-position: center top, 116% 2rem;
+    background-size: cover, 19rem auto;
     background-blend-mode: multiply, luminosity;
   }
   [data-theme='dark'] body {
     background-image: radial-gradient(
-        120% 60% at 82% 4%,
-        rgba(126, 198, 201, 0.2),
-        rgba(126, 198, 201, 0) 62%
+        120% 60% at 84% 2%,
+        rgba(126, 198, 201, 0.13),
+        rgba(126, 198, 201, 0) 58%
       ),
       url('/assets/hero/ghost.jpg');
     background-blend-mode: screen, luminosity;
@@ -1227,10 +1196,8 @@ li { margin-bottom: var(--s2); }
 html[data-theme='dark'] { color-scheme: dark; }
 
 [data-theme='dark'] {
-  --air-1: #7ec6c9;
-  --air-2: #a8e0e2;
-  --air-soft: rgba(126, 198, 201, 0.14);
-  --air-alfa: 0.34;
+  --jentik-warna: #a8e0e2;
+  --jentik-alfa: 0.42;
   --paper: #0e1116;
   --paper-soft: #141821;
   --paper-deep: #1a1f29;
