@@ -23,6 +23,13 @@
   --inverse-fg: #f8f6f1;
   --accent-fg: #ffffff;
 
+  /* ungu diambil dari warna baju di foto profil agar latar satu keluarga */
+  --plum: #5f4575;
+  --plum-soft: rgba(95, 69, 117, 0.16);
+  /* kekuatan kisi & sorot di latar */
+  --kisi-alfa: 0.16;
+  --sorot-alfa: 0.42;
+
   --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -80,6 +87,66 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+}
+
+/* ---------- latar interaktif ----------
+   Kisi + sorot kursor digambar di kanvas .backdrop (src/scripts/backdrop.ts).
+   Kalau JS mati atau pengguna minta gerak minim: kisi CSS statis di bawah. */
+/* body Z-index negatif mengacu pada konteks tumpukan terdekat.
+   Tanpa `isolation`, kanvas akan jatuh di BELAKANG latar body dan tak terlihat. */
+body { isolation: isolate; }
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 0.6s var(--ease);
+}
+[data-theme='dark'] .backdrop { opacity: 0.8; }
+
+/* cadangan tanpa JS / gerak minim */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background-image: linear-gradient(to right, var(--plum-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--plum-soft) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+@media (prefers-reduced-motion: reduce) {
+  body::after { opacity: 0.5; }
+}
+
+/* HP: kisi lebih renggang supaya tidak ramai, plus bayangan samar foto profil */
+@media (max-width: 40rem) {
+  body::after { background-size: 44px 44px; }
+  body {
+    background-image: radial-gradient(
+        120% 60% at 78% 6%,
+        rgba(95, 69, 117, 0.20),
+        rgba(95, 69, 117, 0) 62%
+      ),
+      url('/assets/hero/ghost.jpg');
+    background-repeat: no-repeat, no-repeat;
+    background-position: center top, 112% 2rem;
+    background-size: cover, 21rem auto;
+    background-blend-mode: multiply, luminosity;
+    background-attachment: scroll, scroll;
+  }
+  [data-theme='dark'] body {
+    background-image: radial-gradient(
+        120% 60% at 78% 6%,
+        rgba(180, 156, 203, 0.22),
+        rgba(180, 156, 203, 0) 62%
+      ),
+      url('/assets/hero/ghost.jpg');
+    background-blend-mode: screen, luminosity;
+  }
 }
 
 body::before {
@@ -362,7 +429,7 @@ li { margin-bottom: var(--s2); }
 
 .hero-title {
   font-size: var(--fs-display);
-  line-height: 0.98;
+  line-height: 1.04;
   letter-spacing: -0.035em;
   font-weight: 400;
 }
@@ -370,17 +437,26 @@ li { margin-bottom: var(--s2); }
   font-style: italic;
   color: var(--accent);
 }
-.hero-line { display: block; overflow: hidden; }
+/* Baris judul sengaja TIDAK memakai overflow: hidden.
+   Dulu `overflow: hidden` + line-height 0.98 memotong ekor huruf g/j/y/;`,
+   dan slot 105% hanya bisa menutup tinggi kotak — bukan tinggi mesin huruf.
+   Jadi animasinya memakai clip-path (bebas dari overflow) dengan cadangan
+   padding di dalam span agar ekor huruf tetap punya ruang. */
+.hero-line { display: block; padding-bottom: 0.16em; margin-bottom: -0.16em; }
 .hero-line > span {
   display: block;
-  transform: translateY(105%);
+  padding-bottom: 0.08em;
+  clip-path: inset(-0.4em -0.2em 100% -0.2em);
+  transform: translateY(0.28em);
   animation: lineUp 1.05s var(--ease-out) forwards;
+  will-change: clip-path, transform;
 }
 .hero-line:nth-child(2) > span { animation-delay: 0.09s; }
 .hero-line:nth-child(3) > span { animation-delay: 0.18s; }
+.hero-line:nth-child(4) > span { animation-delay: 0.27s; }
 
 @keyframes lineUp {
-  to { transform: translateY(0); }
+  to { clip-path: inset(-0.4em -0.2em -0.4em -0.2em); transform: translateY(0); }
 }
 
 .hero-aside {
@@ -1145,6 +1221,10 @@ li { margin-bottom: var(--s2); }
 html[data-theme='dark'] { color-scheme: dark; }
 
 [data-theme='dark'] {
+  --plum: #b49ccb;
+  --plum-soft: rgba(180, 156, 203, 0.16);
+  --kisi-alfa: 0.20;
+  --sorot-alfa: 0.50;
   --paper: #0e1116;
   --paper-soft: #141821;
   --paper-deep: #1a1f29;

@@ -29,7 +29,10 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
           <h1 class="hero-title">
             {heroParts.map((parts) => (
               <span class="hero-line">
-                <span>{parts.map((p) => (p.em ? <em>{p.text}</em> : p.text))}</span>
+                <span>
+                  {parts.map((p) => (p.em ? <em>{p.text}</em> : p.text))}
+                  <wbr />
+                </span>
               </span>
             ))}
           </h1>
