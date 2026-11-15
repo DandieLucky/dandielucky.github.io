@@ -123,7 +123,7 @@ Agar hanya satu tempat yang perlu diperbarui, peta folder → proyek ada di bagi
 1. Salin salah satu file di `src/content/work/id/`, ganti nama jadi `<slug-baru>.mdx`.
 2. Ubah frontmatter: `slug`, `order`, `title`, `tagline`, `summary`, `role`, `client`, `year`, `disciplines`, `scope`, `tools`, `cover`.
 3. Lakukan hal yang sama di `src/content/work/en/<slug-baru>.mdx`.
-4. Siapkan `public/assets/work/<slug-baru>/cover.jpg` dan `proses-01..03.jpg`.
+4. Tambahkan entri proyeknya di `scripts/import-assets.mjs` (bagian `PROJECTS`) berisi folder asal dan daftar berkasnya, lalu jalankan skrip itu — cover, galeri, dan video dibuat otomatis.
 5. `npm run build`. Rute `/work/<slug-baru>` dan `/en/work/<slug-baru>` otomatis dibuat.
 
 ---
