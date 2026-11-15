@@ -28,7 +28,7 @@ const ogImage = `${siteUrl}${og ?? '/assets/og.png'}`;
 ---
 
 <!doctype html>
-<html lang={lang} data-backdrop="on">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -122,11 +122,6 @@ const ogImage = `${siteUrl}${og ?? '/assets/og.png'}`;
 
     <script>
       import '../scripts/site.js';
-    </script>
-    <script>
-      import { initBackdrop } from '../scripts/backdrop';
-      initBackdrop();
-      document.addEventListener('astro:page-load', initBackdrop);
     </script>
   </body>
 </html>
