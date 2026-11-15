@@ -1,27 +1,86 @@
-// Jentikan air di kursor: cincin tipis yang menyebar lalu memudar.
-// Latar dibiarkan kosong — tidak ada garis/kisi/gelombang yang menutupi teks.
-// Cincin hanya lahir saat kursor benar-benar bergerak, lalu hilang sendiri.
+// Water Ripple — simulasi permukaan air sungguhan di belakang konten.
+//
+// Metode: dua kisi tinggi (Float32Array). Tiap bingkai tiap sel menjadi
+// rata-rata empat tetangganya × 2 dikurangi nilainya sendiri, lalu diredam.
+// Itu bentuk diskrit persamaan gelombang — riak benar-benar menyebar,
+// memantul di tepi, dan bersilangan antar-jentikan.
+//
+// Semua yang terlihat diturunkan dari kisi tinggi itu:
+//   • lereng gelombang -> kilau & bayangan (kesan permukaan air 3D)
+//   • pembiasan: judul & paragraf bergeser ≥1 px mengikuti kemiringan air,
+//     jadi teksnya ikut beriak tipis saat riak lewat (refraksi)
+//   • warna air & pencampuran mode layar diatur CSS (.backdrop)
+//
+// Hemat: berhenti sendiri saat air tenang, saat tab disembunyikan, dan
+// dimatikan untuk prefers-reduced-motion.
 
-type Cincin = { x: number; y: number; lahir: number; radius: number; tebal: number };
+type Titik = { x: number; y: number };
 
 let kanvas: HTMLCanvasElement | null = null;
 let ctx: CanvasRenderingContext2D | null = null;
-let raf = 0;
-let jalan = false;
-let pendengar = false;
+let bufTampil: HTMLCanvasElement | null = null;
+let bufCtx: CanvasRenderingContext2D | null = null;
+let gambar: ImageData | null = null;
 
-let cincin: Cincin[] = [];
-let terakhir = { x: -9999, y: -9999 };
-let diamSejak = 0;
-let jarakJalan = 0;
+// kisi tinggi: "sekarang" dan "sebelumnya"
+let a: Float32Array = new Float32Array(0);
+let b: Float32Array = new Float32Array(0);
+
+let KOLOM = 0;
+let BARIS = 0;
+let SEL = 3; // px CSS per sel
+let DPR = 1;
+
+let jalan = false;
+let raf = 0;
+let pendengar = false;
+let tenang = true;
+
+let kursorLama: Titik = { x: -9999, y: -9999 };
+let jatuhTerakhir = 0;
 
 const kurangiGerak = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const JARAK_MIN = 52; // px — jeda minimum antar cincin
-const JARAK_MAKS = 140; // px — saat kursor bergerak cepat, cincin lebih renggang
-const UMUR = 820; // ms
-const RADIUS_AKHIR = 58; // px
-const MAKS = 14; // cincin bersamaan
+// ---------- setelan (bisa ditimpa lewat data-* di <html>) ----------
+const ambil = (nama: string, cadangan: number) => {
+  const v = parseFloat(document.documentElement.dataset[nama] ?? '');
+  return Number.isFinite(v) ? v : cadangan;
+};
+const damping = () => ambil('rippleDamping', 0.986);
+const radiusJatuh = () => ambil('rippleRadius', 6);
+const kuatKlik = () => ambil('rippleKuat', 2400);
+const kuatHover = () => ambil('rippleHover', 300);
+const biasCahaya = () => ambil('rippleCahaya', 1600);
+const biasBias = () => ambil('rippleBias', 60);
+
+// ---------- kisi ----------
+function ukurUlang() {
+  if (!kanvas || !ctx) return;
+  const w = Math.max(1, document.documentElement.clientWidth);
+  const h = Math.max(1, window.innerHeight);
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+  // batasi jumlah sel supaya ringan (≤ ~260 ribu sel)
+  SEL = Math.max(3, Math.ceil(Math.sqrt((w * h) / 260000)));
+  KOLOM = Math.floor(w / SEL) + 1;
+  BARIS = Math.floor(h / SEL) + 1;
+
+  kanvas.width = Math.round(w * DPR);
+  kanvas.height = Math.round(h * DPR);
+  kanvas.style.width = w + 'px';
+  kanvas.style.height = h + 'px';
+
+  a = new Float32Array(KOLOM * BARIS);
+  b = new Float32Array(KOLOM * BARIS);
+
+  if (!bufTampil) {
+    bufTampil = document.createElement('canvas');
+    bufCtx = bufTampil.getContext('2d');
+  }
+  bufTampil.width = KOLOM;
+  bufTampil.height = BARIS;
+  gambar = bufCtx ? bufCtx.createImageData(KOLOM, BARIS) : null;
+}
 
 function siapkan() {
   document.querySelectorAll('canvas.backdrop').forEach((c, i) => {
@@ -39,77 +98,169 @@ function siapkan() {
   ukurUlang();
 }
 
-function ukurUlang() {
-  if (!kanvas || !ctx) return;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const w = document.documentElement.clientWidth;
-  const h = window.innerHeight;
-  kanvas.width = Math.round(w * dpr);
-  kanvas.height = Math.round(h * dpr);
-  kanvas.style.width = w + 'px';
-  kanvas.style.height = h + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+// ---------- satu jentikan ----------
+function jatuh(cx: number, cy: number, radiusPx: number, kuat: number) {
+  const i0 = Math.round(cx / SEL);
+  const j0 = Math.round(cy / SEL);
+  const r = Math.max(2, Math.round(radiusPx / SEL));
+  for (let j = -r; j <= r; j++) {
+    for (let i = -r; i <= r; i++) {
+      const x = i0 + i;
+      const y = j0 + j;
+      if (x <= 0 || y <= 0 || x >= KOLOM - 1 || y >= BARIS - 1) continue;
+      const d = Math.sqrt(i * i + j * j);
+      if (d > r) continue;
+      // turun di tengah, netral di tepi -> bentuk tetes
+      const bentuk = Math.cos((d / r) * Math.PI * 0.5);
+      a[y * KOLOM + x] += kuat * bentuk * bentuk;
+    }
+  }
+  tenang = false;
 }
 
-function warna(nama: string, cadangan: string) {
-  const v = getComputedStyle(document.documentElement).getPropertyValue(nama).trim();
-  return v || cadangan;
-}
+// ---------- satu langkah simulasi + gambar ----------
+function langkah() {
+  if (!ctx || !kanvas || !gambar || !bufCtx || !bufTampil) return;
 
-function hexDanAlfa(hex: string, a: number) {
-  const h = hex.replace('#', '').trim();
-  const penuh =
-    h.length === 3 ? h.split('').map((x) => x + x).join('') : h.padEnd(6, '0').slice(0, 6);
-  const r = parseInt(penuh.slice(0, 2), 16) || 42;
-  const g = parseInt(penuh.slice(2, 4), 16) || 111;
-  const b = parseInt(penuh.slice(4, 6), 16) || 119;
-  return `rgba(${r}, ${g}, ${b}, ${a})`;
-}
-
-function frame(t: number) {
-  if (!ctx || !kanvas) return;
-  const w = document.documentElement.clientWidth;
-  const h = window.innerHeight;
+  const redam = damping();
+  const bias = biasCahaya();
   const gelap = document.documentElement.dataset.theme === 'dark';
-  const air = warna('--jentik-warna', gelap ? '#a8e0e2' : '#2a6f77');
-  const alfaDasar = parseFloat(warna('--jentik-alfa', '0.34')) || 0.34;
+  let maks = 0;
 
-  ctx.clearRect(0, 0, w, h);
-  cincin = cincin.filter((c) => t - c.lahir < UMUR);
-
-  for (const c of cincin) {
-    const p = Math.min(1, (t - c.lahir) / UMUR);
-    const mudah = 1 - Math.pow(1 - p, 2.2); // melambat seperti riak air
-    const r = c.radius + (RADIUS_AKHIR - c.radius) * mudah;
-    const alfa = alfaDasar * (1 - p) * (1 - p);
-
-    // cincin utama
-    ctx.beginPath();
-    ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
-    ctx.strokeStyle = hexDanAlfa(air, alfa);
-    ctx.lineWidth = c.tebal * (1 - p * 0.6);
-    ctx.stroke();
-
-    // cincin kedua lebih lebar & samar -> kesan permukaan air, bukan donat
-    ctx.beginPath();
-    ctx.arc(c.x, c.y, r * 1.32, 0, Math.PI * 2);
-    ctx.strokeStyle = hexDanAlfa(air, alfa * 0.32);
-    ctx.lineWidth = Math.max(0.5, c.tebal * 0.65 * (1 - p));
-    ctx.stroke();
+  // A. persamaan gelombang (tepi = dinding: pinggiran diredam kuat,
+  //    jadi riak memantul balik seperti di kolam, tidak hilang di tepi layar)
+  for (let y = 1; y < BARIS - 1; y++) {
+    const baris = y * KOLOM;
+    for (let x = 1; x < KOLOM - 1; x++) {
+      const i = baris + x;
+      let baru =
+        ((a[i - 1] + a[i + 1] + a[i - KOLOM] + a[i + KOLOM]) * 0.5 - b[i]) * redam;
+      const diTepi = x < 2 || y < 2 || x > KOLOM - 3 || y > BARIS - 3;
+      if (diTepi) baru *= 0.55;
+      b[i] = baru;
+      const abs = baru < 0 ? -baru : baru;
+      if (abs > maks) maks = abs;
+    }
   }
+  // tukar: b (keadaan baru) jadi a (sekarang), a jadi b (sebelumnya)
+  const tukar = a;
+  a = b;
+  b = tukar;
 
-  if (cincin.length > 0) {
-    raf = requestAnimationFrame(frame);
-  } else {
-    ctx.clearRect(0, 0, w, h);
+  // B. render: kemiringan gelombang -> kilau & bayangan
+  const data = gambar.data;
+  const alfaKilau = gelap ? 0.30 : 0.55;
+  const alfaBayang = gelap ? 0.26 : 0.34;
+  for (let y = 1; y < BARIS - 1; y++) {
+    const baris = y * KOLOM;
+    for (let x = 1; x < KOLOM - 1; x++) {
+      const i = baris + x;
+      const sx = (a[i - 1] - a[i + 1]) / 2;
+      const sy = (a[i - KOLOM] - a[i + KOLOM]) / 2;
+      let v = (-sx - sy) * (bias / 1000); // cahaya dari kiri-atas
+      if (v > 220) v = 220;
+      if (v < -220) v = -220;
+      const p = i * 4;
+      if (v >= 0) {
+        data[p] = 255;
+        data[p + 1] = 255;
+        data[p + 2] = 255;
+        data[p + 3] = (v * alfaKilau) | 0;
+      } else {
+        data[p] = 12;
+        data[p + 1] = 22;
+        data[p + 2] = 26;
+        data[p + 3] = (-v * alfaBayang) | 0;
+      }
+    }
+  }
+  bufCtx.putImageData(gambar, 0, 0);
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, kanvas.width, kanvas.height);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bufTampil, 0, 0, KOLOM * SEL * DPR, BARIS * SEL * DPR);
+
+  // C. pembiasan konten mengikuti kemiringan air
+  terapkanPembiasan(biasBias());
+
+  if (maks < 0.9) {
+    tenang = true;
     jalan = false;
+    ctx.clearRect(0, 0, kanvas.width, kanvas.height);
+    a.fill(0);
+    b.fill(0);
+    pulihkanKonten();
+    return;
+  }
+  raf = requestAnimationFrame(putar);
+}
+
+function putar() {
+  // dua langkah per bingkai: riak menyebar lebih cepat & jelas terlihat,
+  // bukan merayap pelan seperti di kolam raksasa
+  langkah();
+  if (jalan) langkah();
+}
+
+// ---------- pembiasan konten ----------
+let elemenKonten: HTMLElement[] = [];
+let siapKonten = false;
+
+function cariKonten() {
+  const pola: HTMLElement[] = [];
+  const judul = document.querySelector<HTMLElement>('.hero-title, main h1, main .case-hero h1');
+  if (judul) pola.push(judul);
+  document.querySelectorAll<HTMLElement>('[data-ripple]').forEach((el) => pola.push(el));
+  elemenKonten = pola;
+  siapKonten = pola.length > 0;
+}
+
+// kemiringan air pada satu titik kisi
+function lereng(xpx: number, ypx: number): Titik {
+  const x = Math.max(1, Math.min(KOLOM - 2, Math.round(xpx / SEL)));
+  const y = Math.max(1, Math.min(BARIS - 2, Math.round(ypx / SEL)));
+  const i = y * KOLOM + x;
+  return { x: (a[i - 1] - a[i + 1]) / 2, y: (a[i - KOLOM] - a[i + KOLOM]) / 2 };
+}
+
+function terapkanPembiasan(kuat: number) {
+  if (!siapKonten) cariKonten();
+  if (elemenKonten.length === 0) return;
+
+  for (const el of elemenKonten) {
+    const r = el.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > window.innerHeight) {
+      if (el.style.transform) el.style.transform = '';
+      continue;
+    }
+    // dua titik pada elemen: kiri-atas & kanan-bawah, lalu gabungkan
+    const l = lereng(r.left + r.width * 0.2, r.top + r.height * 0.3);
+    const rr = lereng(r.left + r.width * 0.8, r.top + r.height * 0.75);
+    const sx = (l.x + rr.x) / 2;
+    const sy = (l.y + rr.y) / 2;
+    const batas = 4;
+    const dx = Math.max(-batas, Math.min(batas, (sx * kuat) / 380));
+    const dy = Math.max(-batas, Math.min(batas, (sy * kuat) / 380));
+    el.style.transform =
+      dx || dy ? `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0)` : '';
+    el.style.willChange = 'transform';
   }
 }
 
+function pulihkanKonten() {
+  for (const el of elemenKonten) {
+    el.style.transform = '';
+    el.style.willChange = '';
+  }
+}
+
+// ---------- penjadwalan ----------
 function jadwal() {
-  if (jalan) return;
+  if (jalan || kurangiGerak() || document.hidden) return;
   jalan = true;
-  raf = requestAnimationFrame(frame);
+  raf = requestAnimationFrame(putar);
 }
 
 function pasang() {
@@ -120,47 +271,48 @@ function pasang() {
     (e) => {
       if (kurangiGerak()) return;
       const now = performance.now();
-      const dx = e.clientX - terakhir.x;
-      const dy = e.clientY - terakhir.y;
+      const dx = e.clientX - kursorLama.x;
+      const dy = e.clientY - kursorLama.y;
       const jarak = Math.hypot(dx, dy);
-
-      // kursor baru masuk jendela -> jangan tarik cincin dari titik mustahil
-      if (terakhir.x < -9000 || jarak > 400) {
-        terakhir = { x: e.clientX, y: e.clientY };
-        diamSejak = now;
-        jarakJalan = 0;
-        return;
-      }
-      if (jarak < 1.2) return; // getaran mikro diabaikan
-
-      terakhir = { x: e.clientX, y: e.clientY };
-      diamSejak = now;
-
-      // makin cepat kursor, makin renggang cincinnya supaya tidak menumpuk
-      const cepat = Math.min(1, jarak / 40);
-      const butuh = JARAK_MIN + (JARAK_MAKS - JARAK_MIN) * cepat;
-      jarakJalan += jarak;
-
-      if (jarakJalan >= butuh && cincin.length < MAKS) {
-        jarakJalan = 0;
-        cincin.push({ x: e.clientX, y: e.clientY, lahir: now, radius: 4, tebal: 1.1 });
-        jadwal();
-      }
+      const baru = kursorLama.x < -9000 || jarak > 400;
+      kursorLama = { x: e.clientX, y: e.clientY };
+      if (baru || jarak < 2) return;
+      if (now - jatuhTerakhir < 42) return;
+      jatuhTerakhir = now;
+      // jejak bangun: makin cepat kursor, makin kuat jentikannya
+      const kuat = Math.min(kuatHover(), kuatHover() * (jarak / 26));
+      jatuh(e.clientX, e.clientY, radiusJatuh() * 1.1, kuat);
+      jadwal();
     },
     { passive: true }
   );
 
-  document.addEventListener('mouseleave', () => {
-    terakhir = { x: -9999, y: -9999 };
-  });
-  window.addEventListener('blur', () => {
-    terakhir = { x: -9999, y: -9999 };
-  });
+  window.addEventListener(
+    'pointerdown',
+    (e) => {
+      if (kurangiGerak()) return;
+      jatuh(e.clientX, e.clientY, radiusJatuh() * 1.7, kuatKlik());
+      jadwal();
+    },
+    { passive: true }
+  );
+
   window.addEventListener('resize', ukurUlang, { passive: true });
-  new MutationObserver(() => ukurUlang()).observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
+  document.addEventListener('mouseleave', () => {
+    kursorLama = { x: -9999, y: -9999 };
   });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      cancelAnimationFrame(raf);
+      jalan = false;
+    } else if (!tenang) {
+      jadwal();
+    }
+  });
+  new MutationObserver(() => {
+    ukurUlang();
+    pulihkanKonten();
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 }
 
 export function initBackdrop() {
@@ -170,8 +322,9 @@ export function initBackdrop() {
     pasang();
   } else {
     siapkan();
+    pulihkanKonten();
   }
   cancelAnimationFrame(raf);
   jalan = false;
-  cincin = [];
+  tenang = true;
 }

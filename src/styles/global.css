@@ -23,9 +23,9 @@
   --inverse-fg: #f8f6f1;
   --accent-fg: #ffffff;
 
-  /* jentikan air di kursor — latar dibiarkan kosong */
-  --jentik-warna: #2a6f77;
-  --jentik-alfa: 0.34;
+  /* Water Ripple: air bening di atas kertas (dibaurkan dengan mix-blend) */
+  --air-tinta: #2a6f77;
+  --air-kertas: #eef4f3;
 
   --font-sans: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
@@ -97,6 +97,9 @@ body { isolation: isolate; }
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  /* kanvas keluar sedikit di tepi supaya pembiasan tidak terpotong rapi */
+  width: 100vw;
+  height: 100vh;
 }
 
 /* HP: hanya bayangan samar foto profil di sudut, tanpa pola apa pun */
@@ -1196,8 +1199,8 @@ li { margin-bottom: var(--s2); }
 html[data-theme='dark'] { color-scheme: dark; }
 
 [data-theme='dark'] {
-  --jentik-warna: #a8e0e2;
-  --jentik-alfa: 0.42;
+  --air-tinta: #a8e0e2;
+  --air-kertas: #16222a;
   --paper: #0e1116;
   --paper-soft: #141821;
   --paper-deep: #1a1f29;
