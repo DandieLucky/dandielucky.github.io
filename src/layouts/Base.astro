@@ -22,6 +22,7 @@ const t = ui[lang];
 const other: Lang = lang === 'id' ? 'en' : 'id';
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://dandie.pages.dev';
 const pathname = Astro.url.pathname;
+const isNotFound = /\/404(?:\.html)?\/?$/.test(pathname);
 const canonical = `${siteUrl}${pathname}`;
 const alternate = `${siteUrl}${otherLangPath(pathname, other)}`;
 const ogImage = `${siteUrl}${og ?? '/assets/og.png'}`;
@@ -34,10 +35,14 @@ const ogImage = `${siteUrl}${og ?? '/assets/og.png'}`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang={lang} href={canonical} />
-    <link rel="alternate" hreflang={other} href={alternate} />
-    <link rel="alternate" hreflang="x-default" href={`${siteUrl}${pathname.replace(/^\/en(?=\/|$)/, '') || '/'}`} />
+    {isNotFound ? <meta name="robots" content="noindex" /> : (
+      <>
+        <link rel="canonical" href={canonical} />
+        <link rel="alternate" hreflang={lang} href={canonical} />
+        <link rel="alternate" hreflang={other} href={alternate} />
+        <link rel="alternate" hreflang="x-default" href={`${siteUrl}${pathname.replace(/^\/en(?=\/|$)/, '') || '/'}`} />
+      </>
+    )}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Dandie Lucky Maulana" />

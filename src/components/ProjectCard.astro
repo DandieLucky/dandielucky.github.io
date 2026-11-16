@@ -1,26 +1,30 @@
 ---
 import { assetExists } from '../lib/work';
+import Artwork from './Artwork.astro';
+import { projectPreviews } from '../data/project-previews';
 
 interface Props {
   href: string;
   title: string;
   meta: string[];
   cover: string;
+  slug?: string;
+  role?: string;
   tags: string[];
   status?: 'live' | 'progress';
   badge?: string;
   index?: number;
 }
 
-const { href, title, meta, cover, tags, status = 'live', badge, index = 0 } = Astro.props;
+const { href, title, meta, cover, slug, role, tags, status = 'live', badge, index = 0 } = Astro.props;
 const clean = cover.startsWith('/') ? cover.slice(1) : cover;
-const hasCover = assetExists(cover);
+const hasCover = assetExists(projectPreviews[slug ?? '']?.src ?? cover);
 ---
 
 <a class="card" href={href} data-tags={tags.join(' ')} data-reveal style={`--i:${index}`}>
   <div class="card-media">
     {hasCover ? (
-      <img src={`/${clean}`} alt={title} loading="lazy" decoding="async" width="1200" height="900" />
+      <Artwork slug={slug} cover={cover} alt={title} />
     ) : (
       <div class="slot" style="height:100%;margin:0">
         <div class="slot-inner">
@@ -35,6 +39,7 @@ const hasCover = assetExists(cover);
     <div>
       <span class="card-title">{title}</span>
       <span class="card-meta">{meta.join(' · ')}</span>
+      {role && <span class="card-role">{role}</span>}
     </div>
     {badge ? <span class="badge">{badge}</span> : status === 'progress' ? <span class="badge">Segera</span> : null}
   </div>

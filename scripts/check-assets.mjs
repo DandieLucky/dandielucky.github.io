@@ -3,7 +3,7 @@
  * Cek aset: mana yang masih placeholder, mana yang sudah diganti file asli.
  * Jalankan: npm run check-assets
  */
-import { readFileSync, existsSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -19,11 +19,31 @@ const RESET = '\u001b[0m';
 let pending = [];
 let replaced = [];
 let missing = [];
+const summaryOnly = process.argv.includes('--summary');
+
+// Periksa referensi di kode/MDX juga, termasuk sampul presentasi baru.
+const references = new Set(Object.keys(manifest));
+function collectReferences(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const file = join(dir, entry.name);
+    if (entry.isDirectory()) collectReferences(file);
+    else if (/\.(astro|mdx|ts|js|css|json)$/.test(entry.name)) {
+      const source = readFileSync(file, 'utf8');
+      for (const match of source.matchAll(/["'`]((?:\/)?assets\/[^"'`\s<>]+)["'`]/g)) {
+        if (!match[1].includes('${')) references.add(match[1]);
+      }
+    }
+  }
+}
+collectReferences(join(root, 'src'));
+for (const rel of references) {
+  const file = join(root, 'public', rel.replace(/^\//, ''));
+  if (!existsSync(file) || !statSync(file).isFile() || statSync(file).size === 0) missing.push(rel);
+}
 
 for (const [rel, spec] of Object.entries(manifest)) {
   const file = join(root, 'public', rel.replace(/^\//, ''));
   if (!existsSync(file)) {
-    missing.push(rel);
     continue;
   }
   const kb = Math.round(statSync(file).size / 1024);
@@ -32,6 +52,12 @@ for (const [rel, spec] of Object.entries(manifest)) {
   // dari ukuran file — kartu share og.png yang asli juga kecil tapi bukan slot.
   const isPlaceholder = readFileSync(file).includes(Buffer.from('SLOT ASET', 'latin1'));
   (isPlaceholder ? pending : replaced).push({ rel, spec, kb });
+}
+
+if (summaryOnly) {
+  console.log(`Aset: ${replaced.length} asli, ${pending.length} placeholder, ${missing.length} hilang/kosong; ${references.size} referensi diperiksa.`);
+  missing.forEach((rel) => console.error(`  ! ${rel}`));
+  process.exit(missing.length ? 1 : 0);
 }
 
 const line = (icon, color, rel, spec, kb) =>
@@ -54,3 +80,5 @@ console.log(
     `Cara isi: timpa file placeholder dengan aset asli memakai NAMA FILE SAMA,\n` +
     `lalu jalankan "npm run build". Tidak perlu mengubah kode.\n`
 );
+
+if (missing.length) process.exitCode = 1;

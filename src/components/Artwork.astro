@@ -1,0 +1,27 @@
+---
+import { projectPreviews } from '../data/project-previews';
+import sizes from '../data/asset-meta.json';
+
+interface Props {
+  slug?: string;
+  cover: string;
+  alt: string;
+  priority?: boolean;
+}
+
+const { slug = '', cover, alt, priority = false } = Astro.props;
+const preview = projectPreviews[slug];
+const src = preview?.src ?? cover;
+const [width, height] = (sizes as Record<string, [number, number]>)[src] ?? [1600, 900];
+---
+
+<img
+  src={src}
+  alt={alt}
+  width={width}
+  height={height}
+  loading={priority ? 'eager' : 'lazy'}
+  fetchpriority={priority ? 'high' : undefined}
+  decoding="async"
+  style={`object-position:${preview?.position ?? '50% 50%'};object-fit:${preview?.fit ?? 'cover'}`}
+/>

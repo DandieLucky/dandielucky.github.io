@@ -10,7 +10,10 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = ui[lang];
-const pad = (n: number) => String(n + 1).padStart(2, '0');
+const orderedTimeline = [...timeline].sort((a, b) => {
+  const rank = (year: string) => /sekarang/.test(year) ? Infinity : Number(year.match(/\d{4}/)?.[0] ?? 0);
+  return rank(b.year) - rank(a.year);
+});
 ---
 
 <Base lang={lang} title={t.about.title} description={t.about.description}>
@@ -49,9 +52,9 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
     <div class="wrap">
       <h2 data-reveal>{t.about.timelineTitle}</h2>
       <div class="timeline" style="margin-top:2rem">
-        {timeline.map((item, i) => (
+        {orderedTimeline.map((item, i) => (
           <div class="timeline-item" data-reveal style={`--i:${Math.min(i, 5)}`}>
-            <span class="t-year">{item.year || pad(i)}</span>
+            <span class="t-year">{item.year ? (lang === 'en' ? item.year.replace('Mei', 'May').replace('sekarang', 'present') : item.year) : '—'}</span>
             <span>
               <span class="t-role">{item.role[lang]}</span><br />
               <span class="t-org">{item.org[lang]}</span>

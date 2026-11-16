@@ -1,9 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
-import WorkRow from '../components/WorkRow.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import Artwork from '../components/Artwork.astro';
+import Arrow from '../components/Arrow.astro';
 import Slot from '../components/Slot.astro';
-import { ui, href, type Lang } from '../i18n/ui';
-import { getFeatured } from '../lib/work';
+import { ui, href, site, type Lang } from '../i18n/ui';
+import { getFeatured, getWork } from '../lib/work';
 import { disciplineLabel } from '../data/disciplines';
 
 interface Props {
@@ -12,20 +14,24 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = ui[lang];
-const featured = await getFeatured(lang, 8);
+const featured = await getFeatured(lang, 6);
+const projects = await getWork(lang);
+const highlights = ['olimpiade-polimedia-2025', 'darya-varia', 'wilhelmina-cup-2024']
+  .map((slug) => projects.find((p) => p.data.slug === slug))
+  .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
 const heroParts = t.home.heroLines.map((line) =>
   line.split('*').map((part, i) => ({ text: part, em: i % 2 === 1 }))
 );
 
-const pad = (n: number) => String(n + 1).padStart(2, '0');
 ---
 
 <Base lang={lang} title={t.home.title} description={t.home.description}>
-  <section class="hero">
+  <section class="hero hero--portfolio">
     <div class="wrap">
       <div class="hero-grid">
-        <div>
+        <div class="hero-intro">
+          <p class="hero-eyebrow">{lang === 'id' ? 'Desain grafis · Konten sosial' : 'Graphic design · Social content'}</p>
           <h1 class="hero-title">
             {heroParts.map((parts) => (
               <span class="hero-line">
@@ -36,52 +42,64 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
               </span>
             ))}
           </h1>
+          <p class="lede">{t.home.heroLede}</p>
+          <div class="cta-actions hero-actions">
+            <a class="btn btn--accent" href="#work">{lang === 'id' ? 'Lihat karya' : 'Explore work'} <Arrow /></a>
+            <a class="link" href={site.cv} download>{t.ui.cv} <span aria-hidden="true">↓</span></a>
+          </div>
+          <p class="availability"><span class="dot" aria-hidden="true"></span>{t.ui.available}</p>
         </div>
 
-        <aside class="hero-aside">
-          <p class="availability"><span class="dot" aria-hidden="true"></span>{t.ui.available}</p>
-          <p class="lede">{t.home.heroLede}</p>
-          <dl class="hero-meta">
-            {t.home.meta.map((m) => (
-              <div>
-                <dt>{m.label}</dt>
-                <dd>{m.value}</dd>
+        <div class="hero-showcase" aria-label={lang === 'id' ? 'Pratinjau karya pilihan' : 'Featured project previews'}>
+          {highlights.map((p, i) => (
+            <a class:list={['showcase-item', i === 0 && 'showcase-item--main']} href={href(`/work/${p.data.slug}`, lang)} aria-label={p.data.title}>
+              <div class="showcase-media">
+                <Artwork slug={p.data.slug} cover={p.data.cover ?? ''} alt={p.data.title} priority={i === 0} />
+                <span class="showcase-arrow" aria-hidden="true"><Arrow /></span>
               </div>
-            ))}
-          </dl>
-        </aside>
+              <div class="showcase-caption">
+                <span>{i === 0 ? 'Olimpiade Polimedia' : p.data.client}</span>
+                <span>{disciplineLabel(p.data.disciplines[0], lang)}</span>
+              </div>
+            </a>
+          ))}
+        </div>
       </div>
 
-      <p class="scroll-cue"><span class="bar" aria-hidden="true"></span>{t.ui.scroll}</p>
+      <div class="hero-footer">
+        <p>{lang === 'id' ? 'Jakarta Selatan · Desain, motion & fotografi' : 'South Jakarta · Design, motion & photography'}</p>
+        <a class="link link--icon" href={href('/work', lang)}>{t.ui.seeAll} <Arrow /></a>
+      </div>
     </div>
   </section>
 
-  <section class="section" id="work">
+  <section class="section selected-work" id="work">
     <div class="wrap">
       <div class="section-head">
-        <p class="eyebrow" data-reveal>{t.home.workEyebrow}</p>
+        <p class="eyebrow" data-reveal>{t.home.workEyebrow} / {String(featured.length).padStart(2, '0')}</p>
         <h2 data-reveal style="--i:1">{t.home.workTitle}</h2>
         <p class="lede" data-reveal style="--i:2">{t.home.workLede}</p>
       </div>
 
-      <div class="work-list">
+      <div class="card-grid selected-grid">
         {featured.map((p, i) => (
-          <WorkRow
-            num={pad(i)}
+          <ProjectCard
             title={p.data.title}
-            meta={[p.data.client, ...p.data.disciplines.slice(0, 2).map((d) => disciplineLabel(d, lang))]}
-            year={p.data.year}
-            url={href(`/work/${p.data.slug}`, lang)}
-            preview={p.data.cover ?? ''}
-            previewLabel={p.data.client}
+            meta={p.data.disciplines.slice(0, 2).map((d) => disciplineLabel(d, lang))}
+            role={p.data.role}
+            href={href(`/work/${p.data.slug}`, lang)}
+            cover={p.data.cover ?? ''}
+            slug={p.data.slug}
+            tags={p.data.disciplines}
+            status={p.data.status}
             index={i}
           />
         ))}
       </div>
 
       <p style="margin-top:2rem" data-reveal>
-        <a class="link link--arrow" href={href('/work', lang)}>
-          {t.ui.seeAll} <span class="arrow" aria-hidden="true">↗</span>
+        <a class="link link--icon" href={href('/work', lang)}>
+          {t.ui.seeAll} <Arrow />
         </a>
       </p>
     </div>
@@ -120,8 +138,8 @@ const pad = (n: number) => String(n + 1).padStart(2, '0');
             <p class="lede" style={`max-width:58ch;margin-top:1rem;--i:${i + 2}`} data-reveal>{p}</p>
           ))}
           <p style="margin-top:1.5rem" data-reveal>
-            <a class="link link--arrow" href={href('/about', lang)}>
-              {t.nav.about} <span class="arrow" aria-hidden="true">↗</span>
+            <a class="link link--icon" href={href('/about', lang)}>
+              {t.nav.about} <Arrow />
             </a>
           </p>
         </div>

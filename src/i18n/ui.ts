@@ -121,7 +121,7 @@ export const ui: Record<Lang, Copy> = {
         'Portofolio Dandie Lucky Maulana: desain grafis, konten media sosial, motion graphics, fotografi, dan UI/UX. Mahasiswa D4 Teknologi Rekayasa Multimedia, Polimedia Jakarta.',
       heroLines: ['Visual yang', 'membuat orang', 'berhenti *scrolling*.'],
       heroLede:
-        'Saya Dandie — desainer grafis dan spesialis konten media sosial di Jakarta. Menggabungkan desain, video, fotografi, dan sedikit kode supaya sebuah brand terlihat konsisten sekaligus bekerja.',
+        'Saya Dandie, desainer grafis dan spesialis konten media sosial di Jakarta. Merangkai desain, video, dan fotografi agar brand punya karakter yang konsisten.',
       meta: [
         { label: 'Basis', value: 'Jakarta Selatan, ID' },
         { label: 'Fokus', value: 'Desain Grafis · Konten Sosial' },
@@ -129,9 +129,9 @@ export const ui: Record<Lang, Copy> = {
         { label: 'Magang', value: 'Januari 2027' },
       ],
       workEyebrow: 'Karya terpilih',
-      workTitle: 'Enam proyek yang paling mewakili cara saya bekerja.',
+      workTitle: 'Dari ide, menjadi karya.',
       workLede:
-        'Bukan galeri gambar, tapi catatan kerja: apa masalahnya, apa peran saya, dan apa yang berubah setelahnya.',
+        'Pilihan proyek desain, konten, motion, dan fotografi. Buka tiap karya untuk melihat brief, peran saya, dan proses di baliknya.',
       approachEyebrow: 'Cara kerja',
       approachTitle: 'Tiga hal yang selalu saya jaga.',
       approachSteps: [
@@ -253,7 +253,7 @@ export const ui: Record<Lang, Copy> = {
         'Portfolio of Dandie Lucky Maulana: graphic design, social media content, motion graphics, photography, and UI/UX. Multimedia Engineering student at Polimedia Jakarta.',
       heroLines: ['Visuals that', 'make people', 'stop *scrolling*.'],
       heroLede:
-        'I am Dandie — a graphic designer and social media specialist based in Jakarta. I combine design, video, photography and a bit of code so a brand looks consistent and actually works.',
+        'I am Dandie, a graphic designer and social media specialist in Jakarta. I bring design, video, and photography together to give brands a consistent character.',
       meta: [
         { label: 'Base', value: 'South Jakarta, ID' },
         { label: 'Focus', value: 'Graphic Design · Social Content' },
@@ -261,8 +261,8 @@ export const ui: Record<Lang, Copy> = {
         { label: 'Internship', value: 'January 2027' },
       ],
       workEyebrow: 'Selected work',
-      workTitle: 'Six projects that best show how I work.',
-      workLede: 'Not an image gallery, but a work record: what the problem was, what my role was, and what changed.',
+      workTitle: 'From an idea to something real.',
+      workLede: 'Selected projects in design, content, motion, and photography. Open a project to explore the brief, my role, and the process behind it.',
       approachEyebrow: 'How I work',
       approachTitle: 'Three things I always protect.',
       approachSteps: [
