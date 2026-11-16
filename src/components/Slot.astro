@@ -1,6 +1,7 @@
 ---
 import { assetExists } from '../lib/work';
 import assets from '../data/assets.json';
+import sizes from '../data/asset-meta.json';
 
 interface Props {
   src: string;
@@ -14,12 +15,13 @@ const { src, alt, caption, ratio = '4 / 3', flag = true } = Astro.props;
 const clean = src.startsWith('/') ? src.slice(1) : src;
 const exists = assetExists(src);
 const isPlaceholder = (assets as Record<string, boolean>)[`/${clean}`] === true;
+const [width, height] = (sizes as Record<string, [number, number]>)[`/${clean}`] ?? [1200, 900];
 ---
 
 <figure class="slot-figure" style={`--ratio:${ratio}`}>
   {exists ? (
     <a class="slot-media" href={`/${clean}`} data-lightbox-link aria-label={alt}>
-      <img src={`/${clean}`} alt={alt} loading="lazy" decoding="async" width="1200" height="900" />
+      <img src={`/${clean}`} alt={alt} loading="lazy" decoding="async" width={width} height={height} />
       {flag && isPlaceholder && <span class="asset-flag">slot aset</span>}
     </a>
   ) : (

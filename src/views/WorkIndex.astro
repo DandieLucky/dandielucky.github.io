@@ -41,6 +41,8 @@ const used = disciplines.filter((d) => projects.some((p) => p.data.disciplines.i
             title={p.data.title}
             meta={[p.data.year, p.data.client]}
             cover={p.data.cover ?? ''}
+            slug={p.data.slug}
+            role={p.data.role}
             tags={p.data.disciplines}
             status={p.data.status}
             index={i}

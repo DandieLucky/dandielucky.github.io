@@ -4,8 +4,9 @@ Situs portofolio pribadi: desain grafis, konten media sosial, motion graphics, f
 Dibangun sendiri dengan **Astro 5**, CSS custom, dan JavaScript vanilla — tanpa template, tanpa framework UI.
 
 - **Dua bahasa**: Indonesia di `/`, Inggris di `/en`.
-- **Motion terkontrol**: reveal saat scroll, preview mengikuti kursor, transisi halaman — semua otomatis mati kalau pengunjung mengaktifkan *reduce motion*.
-- **Slot aset**: gambar placeholder sudah terpasang. Ganti dengan file asli memakai **nama file yang sama**, tidak perlu mengubah kode.
+- **Karya langsung terlihat**: hero dengan tiga preview dan enam proyek pilihan bergambar, termasuk di ponsel.
+- **Motion terkontrol**: reveal saat scroll dan transisi halaman mengikuti *reduce motion*.
+- **Aset web ikut repo**: gambar, video, dan CV ada di `public/assets/`. Bahan mentah `Assets/` tetap hanya di komputer pemilik.
 - **Cek aset**: `npm run check-assets` menunjukkan slot mana yang masih placeholder.
 
 ---
@@ -64,7 +65,11 @@ portfolio-dandie/
 
 ## 3. Aset karya (sudah terisi dari folder `Assets/`)
 
-Semua gambar dan video sudah masuk lewat skrip impor — tidak ada slot placeholder lagi, kecuali **foto profil**.
+Semua 79 aset pada manifest tersedia di `public/assets/`, termasuk foto profil dan CV, tanpa placeholder. Clone repo sudah cukup untuk menjalankan dan membangun situs; folder mentah `Assets/` tidak diperlukan.
+
+Perubahan tampilan hanya menggunakan file yang sudah ada. `src/data/project-previews.ts` memilih gambar dan posisi potong untuk thumbnail; file asli tetap utuh dan galeri tetap memakai aset aslinya. Build memeriksa referensi aset dan berhenti jika ada file yang hilang/kosong. Jangan menjalankan `assets:placeholders` untuk memperbarui tampilan karena perintah itu menimpa file dengan placeholder.
+
+Sampul Pusinfomar masih membutuhkan ekspor UI yang diizinkan untuk ditampilkan. Aset yang tersedia sekarang berupa rekaman aplikasi editor; gunakan hasil ekspor asli untuk menggantinya saat tersedia. Tanggal Si Paling Film, BNSP, dan BEM yang belum diketahui ditampilkan sebagai “—”, bukan nomor urut.
 
 ### Cara mengisi ulang / menambah aset
 
@@ -205,13 +210,13 @@ Situs **default terang** (palet editorial yang sama dengan CV). Tombol ☾/☀ d
 - Pilihan disimpan di `localStorage` (`theme`), jadi bertahan saat pindah halaman dan saat kembali lagi.
 - Dipasang oleh skrip kecil di `<head>` **sebelum** halaman dilukis, jadi tidak ada kedipan putih.
 - Tidak mengikuti tema sistem operasi secara otomatis — disengaja, supaya recruiter dengan OS gelap tetap melihat versi terang yang sudah kamu setel.
-- Semua pasangan warna teks/latar di tema gelap sudah diukur: rasio kontras terendah **5.88:1** (di atas ambang WCAG AA 4.5:1).
+- Tema gelap memakai teks terang dan aksen lavender pada permukaan gelap; warna tetap mengikuti token tema yang sama di seluruh halaman.
 
 Mau menjadikannya terang‑saja atau gelap‑saja? Cukup hapus tombol `<button class="theme-toggle" ...>` di `src/components/Header.astro` — sisanya tidak perlu diubah.
 
 ## 8. Catatan desain
 
-- **Arah visual**: editorial terang, tipografi Fraunces + Inter, satu warna aksen navy (`#1C3F5E`) yang sama dengan CV agar brand terasa satu.
+- **Arah visual**: editorial kreatif, tipografi Fraunces + Inter, latar krem `#F8F6F1`, aksen ungu `#6941D9`, dan bidang lavender `#EDE7FA`. Tema gelap memakai aksen lavender dengan teks kontras.
 - **Kenapa bukan dark**: karya berisi poster event terang, foto produk, dan UI aplikasi terang — latar gelap membuat semuanya tenggelam.
 - **Motion**: durasi 0.4–0.7 s, easing `cubic-bezier(.16,1,.3,1)`. Tidak ada scroll-jacking, tidak ada preloader palsu.
 - **Aksesibilitas**: skip link, `aria-current` di navigasi, fokus terlihat, semua animasi mati saat `prefers-reduced-motion`.

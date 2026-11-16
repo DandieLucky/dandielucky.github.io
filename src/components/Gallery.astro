@@ -48,7 +48,7 @@ const dims = (src: string) => sizeMap[src.startsWith('/') ? src : `/${src}`] ?? 
               width={dims(item.src)[0]}
               height={dims(item.src)[1]}
             />
-            {isPlaceholder && <span class="asset-flag">slot aset</span>}
+            {isPlaceholder(item.src) && <span class="asset-flag">slot aset</span>}
           </a>
         ) : (
           <div class="slot" style="min-height:180px">
